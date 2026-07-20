@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site is Building</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #dfff4f 0%, #558b2f 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: white;
+            font-size: 3.5rem;
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.4;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        h1::after {
+            content: '|';
+            margin-left: 5px;
+            animation: blink 0.75s step-end infinite;
+        }
+
+        @keyframes blink {
+            from, to { color: transparent }
+            50% { color: white; }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="typing-text"></h1>
+
+    <script>
+        // 1. THAY ĐỔI Ở ĐÂY: Thêm thẻ <br> vào nơi bạn muốn xuống dòng
+        const text = "Hi Everyone! Site is building<br>Please come back later";
+        const targetElement = document.getElementById("typing-text");
+        
+        let index = 0;
+        const totalDuration = 4500; 
+        const speed = totalDuration / text.length; 
+
+        function typeEffect() {
+            if (index < text.length) {
+                // 2. THAY ĐỔI Ở ĐÂY: Kiểm tra nếu gặp cụm "<br>" thì xuống dòng luôn chứ không gõ từng chữ
+                if (text.substring(index, index + 4) === "<br>") {
+                    targetElement.innerHTML += "<br>";
+                    index += 4; // Bỏ qua 4 ký tự của thẻ <br> để chạy tiếp
+                } else {
+                    targetElement.innerHTML += text.charAt(index);
+                    index++;
+                }
+                setTimeout(typeEffect, speed);
+            }
+        }
+
+        window.onload = typeEffect;
+    </script>
+</body>
+</html>

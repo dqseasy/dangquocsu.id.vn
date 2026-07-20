@@ -1,82 +1,260 @@
-<!DOCTYPE html>
-<html lang="vi">
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site is Building</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
 
-        body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle, #dfff4f 0%, #558b2f 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
+    <!-- ==================== THẺ SEO CĂN BẢN ==================== -->
+    <title>Đặng Quốc Sự | Portfolio - Kỹ Sư Giải Pháp Số & Tự Động Hóa</title>
+    <meta name="description" content="Portfolio cá nhân của Đặng Quốc Sự (DQS) - Chuyên gia tối ưu quy trình, thiết kế hệ thống WoodMind, EWPs, tự động hóa Excel và giải pháp sản xuất MFG.">
+    <meta name="keywords" content="Đặng Quốc Sự, DQS Portfolio, WoodMind, EWPs, Excel Automation, MFG, Kỹ sư giải pháp số, Frontend Developer">
+    <meta name="author" content="Đặng Quốc Sự">
+    <meta name="robots" content="index, follow">
+    <!-- Thẻ Canonical tránh trùng lặp nội dung khi đưa lên domain thật -->
+    <link rel="canonical" href="https://dangquocsu.vn/">
 
-        h1 {
-            color: white;
-            font-size: 3.5rem;
-            text-align: center;
-            max-width: 80%;
-            line-height: 1.4;
-            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
+    <!-- ==================== OPEN GRAPH (SEO ZALO & FACEBOOK) ==================== -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dangquocsu.vn/">
+    <meta property="og:title" content="Đặng Quốc Sự | Portfolio - Kỹ Sư Giải Pháp Số & Tự Động Hóa">
+    <meta property="og:description" content="Khám phá hệ sinh thái các dự án thực tế: WoodMind, EWPs, Excel Automation, MFG và giải pháp số do Đặng Quốc Sự phát triển.">
+    <meta property="og:image" content="https://dangquocsu.vn/img/og-image.jpg"> <!-- Link ảnh xem trước khi gửi link qua Zalo/FB -->
+    <meta property="og:locale" content="vi_VN">
+    <meta property="og:site_name" content="Đặng Quốc Sự Portfolio">
 
-        h1::after {
-            content: '|';
-            margin-left: 5px;
-            animation: blink 0.75s step-end infinite;
-        }
+    <!-- ==================== TWITTER CARD SEO ==================== -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Đặng Quốc Sự | Portfolio - Kỹ Sư Giải Pháp Số">
+    <meta name="twitter:description" content="Chuyên gia tối ưu quy trình, phát triển hệ thống WoodMind, EWPs, tự động hóa Excel & MFG.">
+    <meta name="twitter:image" content="https://dangquocsu.vn/img/og-image.jpg">
 
-        @keyframes blink {
-            from, to { color: transparent }
-            50% { color: white; }
-        }
+    <!-- ==================== FAVICON (BIỂU TƯỢNG TRANG WEB) ==================== -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.2rem;
-                max-width: 90%;
-            }
-        }
-    </style>
+    <!-- ==================== PHÔNG CHỮ GOOGLE (Inter hiện đại) ==================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- ==================== THƯ VIỆN CSS ==================== -->
+    <!-- 1. Bootstrap 5.2.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 2. Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- 3. AOS Animation CSS (Hiệu ứng cuộn chuột) -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+
+    <!-- 4. File CSS Tự Viết (Luôn đặt cuối cùng để có thể ghi đè CSS theo ý muốn) -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- 1. KHUNG CHỜ CỦA HEADER -->
+    <div id="header-placeholder"></div>
+    <main>
+        <!-- HERO BANNER (Hiệu ứng Canvas mới) -->
+        <section class="py-5 bg-light-gradient position-relative overflow-hidden section-padding">
+            <div class="container py-4">
+                <div class="row align-items-center g-5">
+                    <!-- Bên trái: Khung giới thiệu bản thân -->
+                    <div class="col-lg-6 order-2 order-lg-1" data-aos="fade-right" data-aos-duration="1000">
+                        <div class="card border-0 shadow-lg p-4 p-md-5 rounded-custom bg-white position-relative canvas-box">
+                            <div class="position-absolute top-0 start-0 w-100 h-3 bg-lime rounded-top-custom"></div>
+                            <span class="text-uppercase tracking-wider fw-bold small text-lime-dark mb-2 d-block">WOOD TECHNICIAN</span>
+                            <h1 class="display-5 fw-bold text-dark-green mb-3">Cảm ơn bạn đã ghé thăm!</h1>
+                            <p class="lead text-secondary mb-4">
+                                Tôi là một người học trò trong nghề Kỹ thuật gỗ và Quản trị sản xuất. Ngoài ra tôi cũng quan tâm đến công nghệ. Tôi thích biến bản vẽ, vật liệu và quy trình thành những sản phẩm chỉn chu, dễ dùng. Cũng thích tìm cách làm mọi việc gọn hơn bằng công cụ và tư duy mới. <br> Tôi không nghĩ mình biết nhiều, nên vẫn học từ mỗi dự án và từ những người cùng làm. Ngoài công việc, tôi thích sự đơn giản, những cuộc trò chuyện thật lòng, một khoảng yên, và cảm giác mỗi ngày tiến thêm một chút.
+                            </p>
+                            <div class="d-flex gap-3">
+                                <a href="#projects" class="btn btn-custom px-4 py-2.5 fw-bold shadow-sm">Khám Phá Dự Án</a>
+                                <a href="tel:0964548039" class="btn btn-outline-custom px-4 py-2.5 fw-bold">Liên Hệ Ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Bên phải: Tấm ảnh cá nhân (Đã sửa lỗi scale) -->
+                    <div class="col-lg-6 order-1 order-lg-2 text-center" data-aos="fade-left" data-aos-duration="1000">
+                        <div class="position-relative d-inline-block img-canvas-wrapper mx-auto">
+                            <!-- Blob background -->
+                            <div class="position-absolute top-50 start-50 translate-middle bg-lime w-100 h-100 rounded-custom shadow-sm badge-blob"></div>
 
-    <h1 id="typing-text"></h1>
+                            <!-- Hình ảnh đã sửa lỗi, đặt tỷ lệ 1:1 và object-fit: cover -->
+                            <img src="\images\IMG_20260608_215730.jpg" alt="DQS Profile" class="img-fluid rounded-custom shadow-lg position-relative z-1 border border-4 border-white object-fit-cover profile-image-corrected" style="aspect-ratio: 1 / 1;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <script>
-        // 1. THAY ĐỔI Ở ĐÂY: Thêm thẻ <br> vào nơi bạn muốn xuống dòng
-        const text = "Hi Everyone! Site is building<br>Please come back later";
-        const targetElement = document.getElementById("typing-text");
-        
-        let index = 0;
-        const totalDuration = 4500; 
-        const speed = totalDuration / text.length; 
+        <!-- QUÁ TRÌNH LÀM VIỆC (Timeline đối xứng) -->
+        <section class="py-5 bg-white section-padding" id="experience">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="fw-bold text-dark-green display-6">Kinh Nghiệm</h2>
+                    <div class="line-dec mx-auto"></div>
+                </div>
 
-        function typeEffect() {
-            if (index < text.length) {
-                // 2. THAY ĐỔI Ở ĐÂY: Kiểm tra nếu gặp cụm "<br>" thì xuống dòng luôn chứ không gõ từng chữ
-                if (text.substring(index, index + 4) === "<br>") {
-                    targetElement.innerHTML += "<br>";
-                    index += 4; // Bỏ qua 4 ký tự của thẻ <br> để chạy tiếp
-                } else {
-                    targetElement.innerHTML += text.charAt(index);
-                    index++;
-                }
-                setTimeout(typeEffect, speed);
-            }
-        }
+                <div class="timeline-wrapper position-relative">
+                    <!-- Node 1 (Bên trái) -->
+                    <div class="timeline-item left-item" data-aos="fade-right" data-aos-duration="800">
+                        <div class="timeline-card p-4 bg-white shadow-sm border rounded-custom position-relative">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <img src="\images\tu-van-thiet-ke-bao-gia-thi-cong.png" alt="Company Icon" class="rounded-circle border border-2 border-lime p-1" style="width: 45px; height: 45px;">
+                                <div>
+                                    <span class="badge bg-lime-dark text-dark-green rounded-pill px-3 mb-1"></span>
+                                    <h5 class="fw-bold text-dark-green mb-0">Tư vấn - Thiết kế</h5>
+                                </div>
+                            </div>
+                            <h6 class="text-secondary fw-semibold">Tập Đoàn Kỹ Nghệ Gỗ Trường Thành</h6>
+                            <p class="text-muted small mb-0">Trực tiếp tư vấn khách hàng về giải pháp sử dụng vật liệu, tiêu chuẩn nội thất. Triển khai đến nhà máy sản xuất đảm bảo công năng, kết cấu sản phẩm. Tham gia các dự án sản xuất nội thất xuất khẩu đồ rời và nội thất liền tường tại Mỹ, Canada, Úc...</p>
+                        </div>
+                    </div>
 
-        window.onload = typeEffect;
-    </script>
+                    <!-- Node 2 (Bên phải) -->
+                    <div class="timeline-item right-item" data-aos="fade-left" data-aos-duration="800">
+                        <div class="timeline-card p-4 bg-white shadow-sm border rounded-custom position-relative">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <img src="\images\pngtree-a-cartoon-teacher-teaching-online-education-concept-vector-png-image_15361409.png" alt="Company Icon" class="rounded-circle border border-2 border-lime p-1" style="width: 45px; height: 45px;">
+                                <div>
+                                    <span class="badge bg-lime-dark text-dark-green rounded-pill px-3 mb-1"></span>
+                                    <h5 class="fw-bold text-dark-green mb-0">Giáo Viên Tin Học Đồ Họa</h5>
+                                </div>
+                            </div>
+                            <h6 class="text-secondary fw-semibold">Trung Tâm Tin Học Sao Việt</h6>
+                            <p class="text-muted small mb-0">Trực tiếp giảng dạy các lớp đồ họa ngắn hạn như AutoCAD, Inventor, Corel, Sketchup ABF, Aspire và các lớp nâng cao về Excel, luyện thi MOS. Tham gia các dự án về tùy biến công cụ cho doanh nghiệp bằng VBA.</p>
+                        </div>
+                    </div>
+
+                    <!-- Node 3 (Bên trái) -->
+                    <div class="timeline-item left-item" data-aos="fade-right" data-aos-duration="800">
+                        <div class="timeline-card p-4 bg-white shadow-sm border rounded-custom position-relative">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <img src="\images\images.png" alt="Company Icon" class="rounded-circle border border-2 border-lime p-1" style="width: 45px; height: 45px;">
+                                <div>
+                                    <span class="badge bg-lime-dark text-white rounded-pill px-3 mb-1"></span>
+                                    <h5 class="fw-bold text-dark-green mb-0">Giám Đốc Nhà Máy</h5>
+                                </div>
+                            </div>
+                            <h6 class="text-secondary fw-semibold">Công Ty Cổ Phẩn Quốc Tế Kevin</h6>
+                            <p class="text-muted small mb-0">Lập kế hoạch và điều phối hoạt động sản xuất tại nhà máy, đào tạo nguồn nhân lực, quản trị chuỗi cung ứng, nghiên cứu phát triển sản phẩm, đảm bảo chất lượng đầu ra. Triển khai Lean, 5S, Kaizen... nâng OEE nhà máy từ 35% lên 95% trong 2 năm.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KỸ NĂNG CÁ NHÂN -->
+        <section class="py-5 bg-light-gradient section-padding" id="skills">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="fw-bold text-dark-green display-6">Kỹ Năng Chuyên Môn</h2>
+                    <div class="line-dec mx-auto"></div>
+                </div>
+
+                <div class="row g-4 justify-content-center">
+                    <!-- Skill 1 -->
+                    <div class="col-6 col-md-4 col-lg-2.5 text-center" data-aos="zoom-in" data-aos-delay="100">
+                        <div class="card border-0 shadow-sm p-4 rounded-custom bg-white h-100 skill-card">
+                            <div class="fs-1 text-lime-dark mb-2"><i class="bi bi-cpu-fill"></i></div>
+                            <h6 class="fw-bold text-dark-green mb-0">Hệ Thống MFG</h6>
+                        </div>
+                    </div>
+                    <!-- Skill 2 -->
+                    <div class="col-6 col-md-4 col-lg-2.5 text-center" data-aos="zoom-in" data-aos-delay="200">
+                        <div class="card border-0 shadow-sm p-4 rounded-custom bg-white h-100 skill-card">
+                            <div class="fs-1 text-lime-dark mb-2"><i class="bi bi-file-earmark-excel-fill"></i></div>
+                            <h6 class="fw-bold text-dark-green mb-0">Excel Nâng Cao</h6>
+                        </div>
+                    </div>
+                    <!-- Skill 3 -->
+                    <div class="col-6 col-md-4 col-lg-2.5 text-center" data-aos="zoom-in" data-aos-delay="300">
+                        <div class="card border-0 shadow-sm p-4 rounded-custom bg-white h-100 skill-card">
+                            <div class="fs-1 text-lime-dark mb-2"><i class="bi bi-layers-half"></i></div>
+                            <h6 class="fw-bold text-dark-green mb-0">Cấu Trúc Hệ Thống</h6>
+                        </div>
+                    </div>
+                    <!-- Skill 4 -->
+                    <div class="col-6 col-md-4 col-lg-2.5 text-center" data-aos="zoom-in" data-aos-delay="400">
+                        <div class="card border-0 shadow-sm p-4 rounded-custom bg-white h-100 skill-card">
+                            <div class="fs-1 text-lime-dark mb-2"><i class="bi bi-code-square"></i></div>
+                            <h6 class="fw-bold text-dark-green mb-0">Backend Dev</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SẢN PHẨM & DỰ ÁN ĐÃ THỰC HIỆN -->
+        <section class="py-5 bg-white section-padding" id="projects">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="fw-bold text-dark-green display-6">Dự Án & Sản Phẩm Nổi Bật</h2>
+                    <div class="line-dec mx-auto"></div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Dự án 1: WoodMind -->
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="card border-0 shadow-sm rounded-custom overflow-hidden h-100 project-card">
+                            <img src="\images\BCO.e1f726a6-3c88-4fd7-b59f-df7d39a902ac.png" class="card-img-top object-fit-cover" alt="FixCodeCNC">
+                            <div class="card-body p-4 bg-white">
+                                <span class="badge bg-lime-light text-dark-green mb-2 px-3 py-1.5 rounded-pill fw-bold">EWPs</span>
+                                <h5 class="card-title fw-bold text-dark-green" id="woodmind">Fix code CNC có đài khoan</h5>
+                                <p class="card-text text-muted small">Mini tool dùng để fix lỗi code CNC khi xuất từ phần mềm Aspire cho máy CNC có đài khoan. Thường thời gian gọi đài khoan chậm, thay đổi dao trong đài khoan cũng chậm và 1 vài máy còn xuất hiện lỗi khi đài khoan làm việc spindle dao phay vẫn quay. Nạp toàn bộ code vào thư mục và fix nó trong 1 click với EWPs fix CNC.</p>
+                                <a href="#" class="text-lime-dark fw-bold text-decoration-none small d-flex align-items-center gap-1">Chi tiết dự án <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dự án 2: EWPs -->
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="card border-0 shadow-sm rounded-custom overflow-hidden h-100 project-card">
+                            <img src="\images\Copilot_20260719_190604.png" class="card-img-top object-fit-cover" alt="EWPs">
+                            <div class="card-body p-4 bg-white">
+                                <span class="badge bg-lime-light text-dark-green mb-2 px-3 py-1.5 rounded-pill fw-bold">WoodMind</span>
+                                <h5 class="card-title fw-bold text-dark-green" id="ewps">Xuất BOM tự động trong Inventor</h5>
+                                <p class="card-text text-muted small">Add-in tích hợp vào  Inventor để xuất BOM tự động từ Assembly sang Excel với kích thước tổng thể có thể tùy biến chiều vân gỗ bằng UCS. Được tùy biến theo từng biểu mẫu BOM riêng của từng công ty. Sản phẩm hiện đang được phát triển thêm tính năng tính veneer dán mặt, dán cạnh và diện tích sơn.</p>
+                                <a href="#" class="text-lime-dark fw-bold text-decoration-none small d-flex align-items-center gap-1">Chi tiết dự án <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dự án 3: Excel Automation -->
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                        <div class="card border-0 shadow-sm rounded-custom overflow-hidden h-100 project-card">
+                            <img src="\images\Copilot_20260719_192935.png" class="card-img-top object-fit-cover" alt="Excel Tool">
+                            <div class="card-body p-4 bg-white">
+                                <span class="badge bg-lime-light text-dark-green mb-2 px-3 py-1.5 rounded-pill fw-bold">EWPs</span>
+                                <h5 class="card-title fw-bold text-dark-green" id="excel">Hệ thống Quản lý phôi</h5>
+                                <p class="card-text text-muted small">Scan QR để nhận diện từng phôi ván công nghiệp, kiểm đếm để đưa ra cảnh báo sớm về thiếu phôi, xem trực tiếp bản vẽ và đánh dấu lắp ráp, bao bì. Realtime toàn bộ quá trình sản xuất lên 1 màn hình quản lý. Tính năng suất thực tế và lập kế hoạch sản xuất, điều chỉnh  theo thực tế.</p>
+                                <a href="#" class="text-lime-dark fw-bold text-decoration-none small d-flex align-items-center gap-1">Chi tiết dự án <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 2. KHUNG CHỜ CỦA FOOTER -->
+    <div id="footer-placeholder"></div>
+
+    <!-- ==================== THƯ VIỆN JAVASCRIPT ==================== -->
+    <!-- 1. jQuery 3.7.1 -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- 2. Bootstrap 5.2.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 3. AOS Animation JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- 4. File JavaScript Tự Viết & Khởi Tạo AOS -->
+    <script src="js/main.js"></script>
+</body>
+</html>
 </body>
 </html>
