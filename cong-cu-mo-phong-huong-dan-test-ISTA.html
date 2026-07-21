@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ==================== THẺ SEO CĂN BẢN ==================== -->
+    <title>Đặng Quốc Sự | Công cụ mô phỏng hướng dẫn test ISTA</title>
+    <meta name="description" content="Công cụ mô phỏng hướng dẫn drop test theo ISTA Full-Standards dành cho thiết kế bao bì nội thất ">
+    <meta name="keywords" content="Đặng Quốc Sự, DQS Portfolio, WoodMind, EWPs, Excel Automation, MFG, Kỹ sư giải pháp số, Frontend Developer">
+    <meta name="author" content="Đặng Quốc Sự">
+    <meta name="robots" content="index, follow">
+    <!-- Thẻ Canonical tránh trùng lặp nội dung khi đưa lên domain thật -->
+    <link rel="canonical" href="https://dangquocsu.id.vn/">
+
+    <!-- ==================== OPEN GRAPH (SEO ZALO & FACEBOOK) ==================== -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dangquocsu.id.vn/">
+    <meta property="og:title" content="Đặng Quốc Sự | Công cụ mô phỏng hướng dẫn test ISTA">
+    <meta property="og:description" content="Công cụ mô phỏng hướng dẫn drop test theo ISTA Full-Standards dành cho thiết kế bao bì nội thất">
+    <meta property="og:image" content="https://dangquocsu.id.vn/images/ISTA-Full-Standards-drop-test-simulator-by-Dang-Quoc-Su.png"> <!-- Link ảnh xem trước khi gửi link qua Zalo/FB -->
+    <meta property="og:locale" content="vi_VN">
+    <meta property="og:site_name" content="Đặng Quốc Sự Portfolio">
+
+    <!-- ==================== TWITTER CARD SEO ==================== -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Đặng Quốc Sự | Portfolio - Kỹ Sư Giải Pháp Số">
+    <meta name="twitter:description" content="Chuyên gia tối ưu quy trình, phát triển hệ thống WoodMind, EWPs, tự động hóa Excel & MFG.">
+    <meta name="twitter:image" content="https://dangquocsu.id.vn/images/IMG_20260608_215730.jpg">
+
+    <!-- ==================== FAVICON (BIỂU TƯỢNG TRANG WEB) ==================== -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+
+    <!-- ==================== PHÔNG CHỮ GOOGLE (Inter hiện đại) ==================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- ==================== THƯ VIỆN CSS ==================== -->
+    <!-- 1. Bootstrap 5.2.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 2. Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- 3. AOS Animation CSS (Hiệu ứng cuộn chuột) -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+    <!-- Three.js Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- 4. File CSS Tự Viết (Luôn đặt cuối cùng để có thể ghi đè CSS theo ý muốn) -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 1. KHUNG CHỜ CỦA HEADER -->
+    <div id="header-placeholder"></div>
+
+    <main>
+
+        <div class="container py-4">
+            <!-- Header Banner -->
+            <div class="header-banner text-center">
+                <h2 class="fw-bold mb-1"><i class="fa-solid fa-box-archive me-2"></i>ISTA FULL-STANDARDS DROP TEST SIMULATOR</h2>
+                <p class="mb-0 opacity-75">Công cụ tính toán & mô phỏng 3D quy trình thả rơi đa tiêu chuẩn ISTA (1A, 1B, 2A, 2B, 2C, 3A, 6-Amazon)</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Panel 1: Form Nhập Liệu & Chọn Tiêu Chuẩn -->
+                <div class="col-lg-4">
+                    <div class="card card-custom p-4 h-100">
+                        <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-sliders me-2"></i>Thông Số & Tiêu Chuẩn</h5>
+                        <form id="qcForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Tên sản phẩm / Mã SKU</label>
+                                <input type="text" id="itemName" class="form-control" value="Tủ Gỗ Bàn Trà Tivi" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Trọng Lượng Tổng - GW (kg)</label>
+                                <div class="input-group">
+                                    <input type="number" id="grossWeight" class="form-control" value="35" step="0.1" min="0.1" required>
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Kích Thước Dài x Rộng x Cao (cm)</label>
+                                <div class="row g-2">
+                                    <div class="col-4"><input type="number" id="dimL" class="form-control" value="100" placeholder="L"></div>
+                                    <div class="col-4"><input type="number" id="dimW" class="form-control" value="50" placeholder="W"></div>
+                                    <div class="col-4"><input type="number" id="dimH" class="form-control" value="40" placeholder="H"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Tiêu Chuẩn Thử Nghiệm (Test Standard)</label>
+                                <select id="testStandard" class="form-select fw-semibold">
+                                    <option value="ISTA_1A">ISTA 1A - Non-Simulation (GW ≤ 68kg)</option>
+                                    <option value="ISTA_1B">ISTA 1B - Non-Simulation (GW > 68kg)</option>
+                                    <option value="ISTA_2A">ISTA 2A - Partial Simulation (GW ≤ 68kg)</option>
+                                    <option value="ISTA_2B">ISTA 2B - Partial Simulation (GW > 68kg)</option>
+                                    <option value="ISTA_2C" selected>ISTA 2C - Furniture Packages (Nội thất)</option>
+                                    <option value="ISTA_3A">ISTA 3A - Parcel Delivery System (Chuyển phát)</option>
+                                    <option value="ISTA_6_AMAZON_A">ISTA 6-Amazon.com SIOC Type A (< 23kg)</option>
+                                    <option value="ISTA_6_AMAZON_B">ISTA 6-Amazon.com SIOC Type B (23 - 45kg)</option>
+                                </select>
+                            </div>
+
+                            <button type="button" id="btnCalculate" class="btn btn-primary w-100 fw-bold py-2">
+                                <i class="fa-solid fa-calculator me-2"></i>TÍNH TOÁN & CẬP NHẬT MÔ PHỎNG
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Panel 2: Kết Quả & Khối Canvas Mô Phỏng 3D -->
+                <div class="col-lg-8">
+                    <div class="card card-custom p-4 mb-4">
+                        <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-cube me-2"></i>Mô Phỏng Va Chạm 3D Theo Chuẩn</h5>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <div class="metric-card">
+                                    <small class="text-muted d-block fw-semibold">Cấp Đồ / Phân Loại (Level)</small>
+                                    <span id="resLevel" class="badge bg-info text-dark p-2 mt-1 fs-6">Level 2 (23-45kg)</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="metric-card">
+                                    <small class="text-muted d-block fw-semibold">Phương Pháp Thử (Method)</small>
+                                    <span id="resMethod" class="badge bg-primary p-2 mt-1 fs-6">Free Fall Drop</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="metric-card">
+                                    <small class="text-muted d-block fw-semibold">Tổng Số Lần Thả (Total Drops)</small>
+                                    <h4 id="resDrops" class="fw-bold text-dark mb-0 mt-1">10 Lần</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Three.js 3D Viewport Container -->
+                        <div class="canvas-container mb-3">
+                            <div id="hud-overlay">
+                                <h6>TRẠNG THÁI REALTIME</h6>
+                                <div>Tiêu chuẩn: <span id="hud-standard" class="text-info">ISTA 2C</span></div>
+                                <div>Độ cao thả: <span id="hud-height" class="text-success fw-bold">46 cm</span></div>
+                                <div>Trạng thái: <span id="hud-status" class="text-warning">Sẵn sàng</span></div>
+                            </div>
+                            <div id="webgl-container"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <span class="text-muted small" id="currentStepDesc"><i class="fa-solid fa-circle-info me-1"></i>Đang xem Bước 1.</span>
+                            <div class="d-flex gap-2">
+                                <button id="btnDrop" class="btn btn-danger btn-sm fw-semibold">
+                                    <i class="fa-solid fa-circle-down me-1"></i>Thả Rơi 3D
+                                </button>
+                                <button id="btnPlayAnim" class="btn btn-outline-primary btn-sm fw-semibold">
+                                    <i class="fa-solid fa-rotate-right me-1"></i>Đặt Lai Vị Trí
+                                </button>
+                                <button id="btnNextStep" class="btn btn-primary btn-sm fw-semibold">
+                                    <i class="fa-solid fa-forward me-1"></i>Bước Tiếp Theo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 3: Bảng Checklist Trình Tự Thả -->
+            <div class="row mt-2">
+                <div class="col-12">
+                    <div class="card card-custom p-4">
+                        <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-list-check me-2"></i>Quy Trình Thử Nghiệm Chi Tiết (Drop Sequence Checklist)</h5>
+                        <ul class="list-group step-list-group" id="sequenceList">
+                            <!-- Render động bằng JS -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 2. KHUNG CHỜ CỦA FOOTER -->
+    <div id="footer-placeholder"></div>
+
+    <!-- ==================== THƯ VIỆN JAVASCRIPT ==================== -->
+    <!-- 1. jQuery 3.7.1 -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- 2. Bootstrap 5.2.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 3. AOS Animation JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- 4. File JavaScript Tự Viết & Khởi Tạo AOS -->
+    <script src="js/main.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            let currentStep = 0;
+            let currentStepsData = [];
+            let activeDropHeightCm = 46;
+            let targetBottomY = 4.6;
+
+            // Biến toàn cục Three.js
+            let scene, camera, renderer, box, controls, heightMarker, rulerGroup, hazardBlock;
+            let isDropping = false, isSlowMo = false;
+            let positionY = 4, velocityY = 0, timeScale = 1.0;
+
+            // --- BỘ CƠ SỞ DỮ LIỆU CÁC BƯỚC THẢ RƠI (DROP SEQUENCES) ---
+            const base10Drops = [
+                { step: 1, title: "Lần 1: Góc 2-3-5 (Corner Drop)", desc: "Xoay thùng nghiêng cả 3 trục, hướng Góc 2-3-5 xuống sàn bê tông.", rotX: Math.PI / 4, rotZ: Math.PI / 4, rotY: 0, hazard: false },
+                { step: 2, title: "Lần 2: Cạnh ngắn nhất (Shortest Edge)", desc: "Xoay nghiêng hướng cạnh 2-3 xuống sàn.", rotX: Math.PI / 4, rotZ: 0, rotY: 0, hazard: false },
+                { step: 3, title: "Lần 3: Cạnh trung bình (Medium Edge)", desc: "Xoay nghiêng hướng cạnh 2-5 xuống sàn.", rotX: 0, rotZ: Math.PI / 4, rotY: 0, hazard: false },
+                { step: 4, title: "Lần 4: Cạnh dài nhất (Longest Edge)", desc: "Xoay nghiêng hướng cạnh 3-5 xuống sàn.", rotX: 0, rotZ: Math.PI / 4, rotY: Math.PI / 2, hazard: false },
+                { step: 5, title: "Lần 5: Mặt 3 (Front Face - Trước)", desc: "Xoay Mặt 3 (Trước) hướng xuống sàn.", rotX: Math.PI / 2, rotZ: 0, rotY: 0, hazard: false },
+                { step: 6, title: "Lần 6: Mặt 1 (Top Face - Đỉnh)", desc: "Xoay Mặt 1 (Đỉnh) hướng xuống sàn.", rotX: Math.PI, rotZ: 0, rotY: 0, hazard: false },
+                { step: 7, title: "Lần 7: Mặt 2 (Bottom Face - Đáy)", desc: "Mặt đáy song song nằm phẳng với mặt sàn.", rotX: 0, rotZ: 0, rotY: 0, hazard: false },
+                { step: 8, title: "Lần 8: Mặt 4 (Back Face - Sau)", desc: "Xoay Mặt 4 (Sau) hướng xuống sàn.", rotX: -Math.PI / 2, rotZ: 0, rotY: 0, hazard: false },
+                { step: 9, title: "Lần 9: Mặt 5 (Left Face - Trái)", desc: "Xoay Mặt 5 (Trái) hướng xuống sàn.", rotX: 0, rotZ: -Math.PI / 2, rotY: 0, hazard: false },
+                { step: 10, title: "Lần 10: Mặt 6 (Right Face - Phải)", desc: "Xoay Mặt 6 (Phải) hướng xuống sàn.", rotX: 0, rotZ: Math.PI / 2, rotY: 0, hazard: false }
+            ];
+
+            const baseRotational9Drops = [
+                { step: 1, title: "Lần 1: Góc 2-3-5 (Corner Rotational)", desc: "Nâng Góc 2-3-5 lên độ cao chuẩn và thả nghiêng.", rotX: Math.PI / 6, rotZ: Math.PI / 6, rotY: 0, hazard: false },
+                { step: 2, title: "Lần 2: Cạnh 2-3 (Edge Rotational)", desc: "Nâng Cạnh 2-3 lên độ cao chuẩn và thả xoay.", rotX: Math.PI / 6, rotZ: 0, rotY: 0, hazard: false },
+                { step: 3, title: "Lần 3: Cạnh 2-5 (Edge Rotational)", desc: "Nâng Cạnh 2-5 lên độ cao chuẩn và thả xoay.", rotX: 0, rotZ: Math.PI / 6, rotY: 0, hazard: false },
+                { step: 4, title: "Lần 4: Cạnh 2-6 (Edge Rotational)", desc: "Nâng Cạnh 2-6 lên độ cao chuẩn và thả xoay.", rotX: 0, rotZ: -Math.PI / 6, rotY: 0, hazard: false },
+                { step: 5, title: "Lần 5: Mặt 2 (Bottom Flat)", desc: "Mặt đáy nằm phẳng thả rơi thẳng đứng.", rotX: 0, rotZ: 0, rotY: 0, hazard: false },
+                { step: 6, title: "Lần 6: Mặt 3 (Front Rotational)", desc: "Nâng mặt trước thả rơi nghiêng.", rotX: Math.PI / 3, rotZ: 0, rotY: 0, hazard: false },
+                { step: 7, title: "Lần 7: Mặt 4 (Back Rotational)", desc: "Nâng mặt sau thả rơi nghiêng.", rotX: -Math.PI / 3, rotZ: 0, rotY: 0, hazard: false },
+                { step: 8, title: "Lần 8: Mặt 5 (Left Rotational)", desc: "Nâng mặt trái thả rơi nghiêng.", rotX: 0, rotZ: -Math.PI / 3, rotY: 0, hazard: false },
+                { step: 9, title: "Lần 9: Mặt 6 (Right Rotational)", desc: "Nâng mặt phải thả rơi nghiêng.", rotX: 0, rotZ: Math.PI / 3, rotY: 0, hazard: false }
+            ];
+
+            // Quy trình 17 bước đặc thù cho ISTA 3A & 6-Amazon
+            function generate17StepsData(baseHeight, hazardHeight) {
+                let steps = [];
+                // Đợt 1: 9 bước đầu thả rơi bình thường (chiều cao baseHeight)
+                for (let i = 0; i < 9; i++) {
+                    let item = Object.assign({}, base10Drops[i]);
+                    item.height = baseHeight;
+                    item.step = i + 1;
+                    item.title = `[Đợt 1] ` + item.title;
+                    steps.push(item);
+                }
+                // Đợt 2: 7 bước thả rơi tiếp theo (chiều cao baseHeight)
+                for (let i = 0; i < 7; i++) {
+                    let item = Object.assign({}, base10Drops[i]);
+                    item.height = baseHeight;
+                    item.step = 10 + i;
+                    item.title = `[Đợt 2] Lần ${10 + i}: ` + item.title.split(':')[1];
+                    steps.push(item);
+                }
+                // Bước 17: Hazard Drop (Thả lên vật cản gỗ ở độ cao hazardHeight)
+                steps.push({
+                    step: 17,
+                    title: "Lần 17: Hazard Impact Drop (Thả Khối Cản)",
+                    desc: "Thả phẳng Mặt 2 (Đáy) rơi trực tiếp lên một khối gỗ cản (Hazard Block 12\"x12\"x6\") đặt trên mặt sàn.",
+                    rotX: 0, rotZ: 0, rotY: 0,
+                    hazard: true,
+                    height: hazardHeight
+                });
+                return steps;
+            }
+
+            // --- BỘ THUẬT TOÁN TÍNH TOÁN THEO CÁC TIÊU CHUẨN ISTA ---
+            function calculateTestSpecs(weight, standard) {
+                let method = "", level = "", height = 0, steps = [];
+
+                switch (standard) {
+                    case "ISTA_1A":
+                        level = "Non-Simulation (≤68kg)";
+                        method = "Free Fall Drop";
+                        if (weight <= 10) height = 760;
+                        else if (weight <= 19) height = 610;
+                        else if (weight <= 28) height = 460;
+                        else if (weight <= 45) height = 310;
+                        else height = 200;
+
+                        steps = base10Drops.map(s => ({ ...s, height: height }));
+                        break;
+
+                    case "ISTA_1B":
+                        level = "Heavy Package (>68kg)";
+                        method = "Rotational Drop";
+                        height = (weight > 100) ? 150 : 230;
+                        steps = baseRotational9Drops.slice(0, 5).map((s, idx) => ({ ...s, step: idx + 1, height: height }));
+                        break;
+
+                    case "ISTA_2A":
+                        level = "Partial Simulation (≤68kg)";
+                        method = "Free Fall Drop";
+                        if (weight <= 10) height = 970;
+                        else if (weight <= 19) height = 810;
+                        else if (weight <= 28) height = 660;
+                        else if (weight <= 45) height = 510;
+                        else height = 310;
+
+                        steps = base10Drops.map(s => ({ ...s, height: height }));
+                        break;
+
+                    case "ISTA_2B":
+                        level = "Partial Simulation (>68kg)";
+                        method = "Rotational Edge/Corner";
+                        height = 230;
+                        steps = baseRotational9Drops.map(s => ({ ...s, height: height }));
+                        break;
+
+                    case "ISTA_2C":
+                        if (weight <= 23) {
+                            level = "Level 1 - Light (≤23kg)";
+                            method = "Free Fall Drop";
+                            height = 510;
+                            steps = base10Drops.map(s => ({ ...s, height: height }));
+                        } else if (weight <= 45) {
+                            level = "Level 2 - Medium (23-45kg)";
+                            method = "Free Fall Drop";
+                            height = 310;
+                            steps = base10Drops.map(s => ({ ...s, height: height }));
+                        } else {
+                            level = "Level 3 - Heavy (>45kg)";
+                            method = "Rotational Drop";
+                            height = (weight <= 68) ? 230 : 150;
+                            steps = baseRotational9Drops.map(s => ({ ...s, height: height }));
+                        }
+                        break;
+
+                    case "ISTA_3A":
+                        level = "Parcel Delivery (Standard)";
+                        method = "Free Fall + Hazard Drop";
+                        let baseH = (weight < 32) ? 460 : 300;
+                        let hazardH = (weight < 32) ? 910 : 600;
+                        height = baseH; // Giá trị cơ sở
+                        steps = generate17StepsData(baseH, hazardH);
+                        break;
+
+                    case "ISTA_6_AMAZON_A":
+                        level = "SIOC Type A (<23kg)";
+                        method = "Free Fall + Hazard Drop";
+                        height = 460;
+                        steps = generate17StepsData(460, 910);
+                        break;
+
+                    case "ISTA_6_AMAZON_B":
+                        level = "SIOC Type B (23-45kg)";
+                        method = "Free Fall + Hazard Drop";
+                        height = 300;
+                        steps = generate17StepsData(300, 600);
+                        break;
+                }
+
+                return { method, level, height, steps };
+            }
+
+            // --- KHỞI TẠO THREE.JS ENGINE ---
+            function createNumberTexture(text, label, color) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 256; canvas.height = 256;
+                const ctx = canvas.getContext('2d');
+
+                ctx.fillStyle = color; ctx.fillRect(0, 0, 256, 256);
+                ctx.strokeStyle = '#000'; ctx.lineWidth = 12; ctx.strokeRect(6, 6, 244, 244);
+
+                ctx.fillStyle = '#333'; ctx.font = 'Bold 24px Arial'; ctx.textAlign = 'center';
+                ctx.fillText(label, 128, 50);
+
+                ctx.fillStyle = '#000'; ctx.font = 'Bold 110px Arial';
+                ctx.fillText(text, 128, 170);
+
+                return new THREE.CanvasTexture(canvas);
+            }
+
+            function init3D() {
+                const container = document.getElementById('webgl-container');
+
+                // 1. LẤY KÍCH THƯỚC CHUẨN (Thêm kiểm tra fallback nếu container chưa kịp load CSS)
+                let width = container.clientWidth || container.offsetWidth || 600;
+                let height = container.clientHeight || container.offsetHeight || 480;
+
+                // 2. KHỞI TẠO SCENE & BACKGROUND
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x1a1a1a);
+
+                // 3. KHỞI TẠO CAMERA
+                camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+                camera.position.set(5, 3.5, 6);
+
+                // 4. KHỞI TẠO RENDERER & CHỐNG TRÙNG LẮP CANVAS
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(width, height);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Tối ưu sắc nét trên màn hình Retina/High-DPI
+
+                // Xóa bớt canvas cũ nếu hàm init3D bị gọi lại nhiều lần
+                container.innerHTML = '';
+                container.appendChild(renderer.domElement);
+
+                // 5. KHỞI TẠO ORBIT CONTROLS
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.target.set(0, 1.5, 0);
+
+                // 6. ÁNH SÁNG (LIGHTS)
+                scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+                const light = new THREE.DirectionalLight(0xffffff, 0.6);
+                light.position.set(5, 10, 5);
+                scene.add(light);
+
+                // 7. MẶT SÀN BÊ TÔNG & LƯỚI TỌA ĐỘ
+                const floor = new THREE.Mesh(
+                    new THREE.PlaneGeometry(10, 10),
+                    new THREE.MeshStandardMaterial({ color: 0x222233 })
+                );
+                floor.rotation.x = -Math.PI / 2;
+                scene.add(floor);
+                scene.add(new THREE.GridHelper(10, 10, 0x00d2ff, 0x444444));
+
+                // 8. KHỐI HAZARD BLOCK (Dùng cho ISTA 3A / Amazon)
+                const hazardGeo = new THREE.BoxGeometry(1.2, 0.3, 1.2);
+                const hazardMat = new THREE.MeshStandardMaterial({ color: 0xe67e22 }); // Màu gỗ cam
+                hazardBlock = new THREE.Mesh(hazardGeo, hazardMat);
+                hazardBlock.position.set(0, 0.15, 0);
+                hazardBlock.visible = false;
+                scene.add(hazardBlock);
+
+                // 9. DỰNG MÔ HÌNH THÙNG ĐỒ VÀ THƯỚC ĐO 3D
+                buildBox3D();
+                buildRuler3D();
+
+                // 10. KÍCH HOẠT VÒNG LẶP RENDER
+                animate3D();
+
+                // 11. TỰ ĐỘNG CÂN CHỈNH KHI THAY ĐỔI KÍCH THƯỚC MÀN HÌNH (RESIZE)
+                window.addEventListener('resize', () => {
+                    const w = container.clientWidth;
+                    const h = container.clientHeight;
+                    if (w > 0 && h > 0) {
+                        camera.aspect = w / h;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(w, h);
+                    }
+                });
+            }
+
+            function buildBox3D() {
+                if (box) scene.remove(box);
+
+                let rawL = parseFloat($('#dimL').val()) || 100;
+                let rawW = parseFloat($('#dimW').val()) || 50;
+                let rawH = parseFloat($('#dimH').val()) || 40;
+
+                let maxDim = Math.max(rawL, rawW, rawH);
+                let scale = 1.6 / maxDim;
+
+                const materials = [
+                    new THREE.MeshStandardMaterial({ map: createNumberTexture('6', 'RIGHT', '#eccc68') }),
+                    new THREE.MeshStandardMaterial({ map: createNumberTexture('5', 'LEFT', '#ff7f50') }),
+                    new THREE.MeshStandardMaterial({ map: createNumberTexture('1', 'TOP', '#ffffff') }),
+                    new THREE.MeshStandardMaterial({ map: createNumberTexture('2', 'BOTTOM', '#70a1ff') }),
+                    new THREE.MeshStandardMaterial({ map: createNumberTexture('3', 'FRONT', '#2ed573') }),
+                    new THREE.MeshStandardMaterial({ map: createNumberTexture('4', 'BACK', '#ff6b81') })
+                ];
+
+                box = new THREE.Mesh(new THREE.BoxGeometry(rawL * scale, rawH * scale, rawW * scale), materials);
+
+                const edges = new THREE.LineSegments(
+                    new THREE.EdgesGeometry(box.geometry),
+                    new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 })
+                );
+                box.add(edges);
+                scene.add(box);
+            }
+
+            function buildRuler3D() {
+                if (rulerGroup) scene.remove(rulerGroup);
+                rulerGroup = new THREE.Group();
+
+                const poleGeo = new THREE.CylinderGeometry(0.03, 0.03, 5.5);
+                const poleMat = new THREE.MeshBasicMaterial({ color: 0x777777 });
+                const pole = new THREE.Mesh(poleGeo, poleMat);
+                pole.position.set(-2, 2.75, 0);
+                rulerGroup.add(pole);
+
+                for (let i = 0; i <= 10; i++) {
+                    const tickY = (i * targetBottomY / 10);
+                    const isMajor = (i % 5 === 0);
+
+                    const tickGeo = new THREE.BoxGeometry(isMajor ? 0.3 : 0.15, 0.02, 0.02);
+                    const tickMat = new THREE.MeshBasicMaterial({ color: isMajor ? 0x00d2ff : 0xffffff });
+                    const tick = new THREE.Mesh(tickGeo, tickMat);
+                    tick.position.set(-2, tickY, 0);
+                    rulerGroup.add(tick);
+                }
+
+                const markerGeo = new THREE.ConeGeometry(0.1, 0.25, 4);
+                const markerMat = new THREE.MeshBasicMaterial({ color: 0xff4757 });
+                heightMarker = new THREE.Mesh(markerGeo, markerMat);
+                heightMarker.rotation.z = -Math.PI / 2;
+                heightMarker.position.set(-1.7, targetBottomY, 0);
+                rulerGroup.add(heightMarker);
+
+                scene.add(rulerGroup);
+            }
+
+            function getBottomOffset() {
+                box.updateMatrixWorld(true);
+                const bbox = new THREE.Box3().setFromObject(box);
+                return box.position.y - bbox.min.y;
+            }
+
+            function applyStep() {
+                if (!currentStepsData || currentStepsData.length === 0) return;
+
+                isDropping = false;
+                isSlowMo = false;
+                timeScale = 1.0;
+                velocityY = 0;
+
+                const step = currentStepsData[currentStep];
+                activeDropHeightCm = step.height / 10;
+                targetBottomY = activeDropHeightCm / 10;
+
+                // Bật/tắt khối gỗ Hazard nếu là bước Hazard Drop
+                if (step.hazard) {
+                    hazardBlock.visible = true;
+                } else {
+                    hazardBlock.visible = false;
+                }
+
+                buildRuler3D();
+
+                $('#hud-status').text('Sẵn sàng').attr('class', 'text-warning');
+                $('#hud-height').text(`${activeDropHeightCm} cm`);
+                $('#btnDrop').prop('disabled', false);
+
+                box.rotation.set(step.rotX, step.rotY, step.rotZ);
+
+                const bottomOffset = getBottomOffset();
+                const floorOffsetY = step.hazard ? 0.3 : 0.0; // Nếu có hazard block thì nâng độ cao sàn lên 0.3
+
+                positionY = targetBottomY + bottomOffset + floorOffsetY;
+                box.position.set(0, positionY, 0);
+
+                if (heightMarker) {
+                    heightMarker.position.y = targetBottomY + floorOffsetY;
+                }
+            }
+
+            function startDrop3D() {
+                if (isDropping) return;
+                isDropping = true;
+                $('#hud-status').text('Đang rơi...').attr('class', 'text-danger fw-bold');
+                $('#btnDrop').prop('disabled', true);
+            }
+
+            function animate3D() {
+                requestAnimationFrame(animate3D);
+
+                if (isDropping) {
+                    velocityY += -9.8 * 0.016 * timeScale;
+                    positionY += velocityY * 0.016 * timeScale;
+
+                    const bottomOffset = getBottomOffset();
+                    const currentBottomY = positionY - bottomOffset;
+
+                    const step = currentStepsData[currentStep];
+                    const floorThreshold = step.hazard ? 0.3 : 0.0;
+
+                    if (currentBottomY <= floorThreshold) {
+                        positionY = bottomOffset + floorThreshold;
+
+                        if (!isSlowMo) {
+                            isSlowMo = true;
+                            timeScale = 0.1;
+                            $('#hud-status').text(step.hazard ? 'VA CHẠM KHỐI HAZARD!' : 'VA CHẠM SÀN BÊ TÔNG!').attr('class', 'text-danger fw-bold');
+
+                            setTimeout(() => {
+                                isDropping = false;
+                                $('#hud-status').text('Hoàn thành!').attr('class', 'text-success fw-bold');
+                            }, 1200);
+                        }
+                    }
+
+                    box.position.y = positionY;
+
+                    if (heightMarker) {
+                        heightMarker.position.y = Math.max(floorThreshold, currentBottomY);
+                    }
+
+                    let currentHeightCm = Math.max(0, Math.round(((currentBottomY - floorThreshold) / targetBottomY) * activeDropHeightCm));
+                    $('#hud-height').text(`${currentHeightCm} cm`);
+                }
+
+                controls.update();
+                renderer.render(scene, camera);
+            }
+
+            function renderSequenceList() {
+                const $list = $('#sequenceList').empty();
+                currentStepsData.forEach((s, idx) => {
+                    const activeClass = (idx === currentStep) ? 'active' : '';
+                    const hazardBadge = s.hazard ? `<span class="badge badge-hazard ms-2">HAZARD DROP</span>` : '';
+                    $list.append(`
+                                <li class="list-group-item ${activeClass} d-flex justify-content-between align-items-center" data-index="${idx}">
+                                    <div>
+                                        <div class="fw-bold">${s.title} ${hazardBadge}</div>
+                                        <small class="text-muted">${s.desc}</small>
+                                    </div>
+                                    <span class="badge bg-secondary rounded-pill">${s.height} mm (${s.height / 10} cm)</span>
+                                </li>
+                            `);
+                });
+            }
+
+            function updateStep(newStep) {
+                currentStep = newStep;
+                if (currentStep >= currentStepsData.length) currentStep = 0;
+
+                $('.step-list-group .list-group-item').removeClass('active');
+                $(`.step-list-group .list-group-item[data-index="${currentStep}"]`).addClass('active');
+
+                const step = currentStepsData[currentStep];
+                $('#currentStepDesc').html(`<i class="fa-solid fa-circle-info me-1"></i><b>${step.title}:</b> ${step.desc}`);
+                applyStep();
+            }
+
+            // --- XỬ LÝ SỰ KIỆN TƯƠNG TÁC GIAO DIỆN ---
+            $('#btnCalculate').on('click', function () {
+                const weight = parseFloat($('#grossWeight').val()) || 0;
+                const standard = $('#testStandard').val();
+                const res = calculateTestSpecs(weight, standard);
+
+                currentStepsData = res.steps;
+                currentStep = 0;
+
+                $('#resLevel').text(res.level);
+                $('#resMethod').text(res.method);
+                $('#resDrops').text(`${currentStepsData.length} Lần`);
+                $('#hud-standard').text(standard.replace('_', ' '));
+
+                buildBox3D();
+                renderSequenceList();
+                updateStep(0);
+            });
+
+            $('#btnDrop').on('click', function () {
+                startDrop3D();
+            });
+
+            $('#btnNextStep').on('click', function () {
+                updateStep(currentStep + 1);
+            });
+
+            $('#btnPlayAnim').on('click', function () {
+                applyStep();
+            });
+
+            $(document).on('click', '.step-list-group .list-group-item', function () {
+                updateStep($(this).data('index'));
+            });
+
+            // Run khởi tạo ban đầu
+            init3D();
+            $('#btnCalculate').click();
+        });
+    </script>
+
+</body>
+</html>

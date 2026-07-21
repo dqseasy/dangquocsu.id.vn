@@ -4,6 +4,8 @@
     --color-lime-dark: #15803d; /* Accent xanh trung gian */
     --color-dark-green: #064e3b; /* Xanh lá đậm cực sang */
     --color-light-green-text: #a7f3d0;
+    --primary-navy: #1F4E78;
+    --accent-blue: #2980b9;
 }
 
 /* --- [CSS CỦA LƯỢT TRƯỚC - GIỮ NGUYÊN HOẶC CẬP NHẬT] --- */
@@ -232,4 +234,119 @@ body {
     .img-canvas-wrapper {
         margin-bottom: 2rem;
     }
+}
+/*Dung cho tool ista*/
+/* ==================== CSS CHO TOOL ISTA (ĐẶT Ở NGOÀI MEDIA QUERY) ==================== */
+.card-custom {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background: #fff;
+}
+
+.header-banner {
+    background: linear-gradient(135deg, var(--primary-navy), #0f2b48);
+    color: white;
+    padding: 2rem 1rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: #eef6fc;
+    border-left: 4px solid var(--accent-blue);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.canvas-container {
+    position: relative;
+    background: #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+    height: 480px; /* Bắt buộc có chiều cao trên mọi màn hình */
+}
+
+#webgl-container {
+    width: 100%;
+    height: 100%;
+}
+
+/* HUD Overlay on 3D View */
+#hud-overlay {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #00d2ff;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+    #hud-overlay h6 {
+        margin: 0 0 5px 0;
+        color: #00d2ff;
+        font-weight: bold;
+    }
+
+.step-list-group {
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+    .step-list-group .list-group-item {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-left: 4px solid transparent;
+    }
+
+        .step-list-group .list-group-item:hover {
+            background-color: #f0f7ff;
+        }
+
+        .step-list-group .list-group-item.active {
+            background-color: #e3f2fd;
+            color: #0d6efd;
+            border-left-color: #0d6efd;
+            font-weight: 600;
+        }
+
+.badge-hazard {
+    background-color: #d63031;
+    color: white;
+}
+
+/* Responsive điều chỉnh nhỏ cho Mobile */
+@media (max-width: 991.98px) {
+    .timeline-wrapper::after {
+        left: 20px;
+    }
+
+    .timeline-item {
+        width: 100%;
+        padding-left: 45px;
+        padding-right: 15px;
+    }
+
+        .timeline-item::after {
+            left: 11px;
+        }
+
+    .right-item {
+        left: 0;
+    }
+
+    .img-canvas-wrapper {
+        margin-bottom: 2rem;
+    }
+
+    .canvas-container {
+        height: 360px;
+    }
+    /* Giảm nhẹ chiều cao 3D trên di động */
 }
