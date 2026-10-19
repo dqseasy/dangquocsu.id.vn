@@ -131,7 +131,7 @@ tr.grp td{background:var(--head);font-weight:700}
    GAS_URL: dán link Web App Apps Script (kết thúc bằng /exec) để trang đọc trực tiếp ?format=json
    (dùng khi trang chạy trên GitHub Pages / dangquocsu.id.vn).
    Để trống => dùng "/api/data" của Cloudflare Worker (khi chạy qua Worker.js). */
-const GAS_URL = "";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzU5Tz1t37Tc5TJvYv8kNYHj8B7E5JtX2v8nYujcr_m_kjm-l1fQGyK5zvewXBxzAB1/exec";
 
 /* ================== DỮ LIỆU ================== */
 const DOW = ['T2','T3','T4','T5','T6','T7','CN'];
@@ -453,7 +453,10 @@ function load(fresh){
     ? GAS_URL + (GAS_URL.includes('?') ? '&' : '?') + 'format=json' + (fresh ? '&t=' + Date.now() : '')
     : '/api/data' + (fresh ? '?fresh=1' : '');
   fetch(src,{cache:'no-store'})
-    .then(r=>{ if(!r.ok) return r.text().then(t=>{throw new Error('HTTP '+r.status+' '+t.slice(0,200));}); return r.json(); })
+    .then(r=>{ if(!r.ok) return r.text().then(t=>{
+        if(!GAS_URL && r.status===404) throw new Error('Chưa cấu hình GAS_URL (link Web App Apps Script /exec) trong NS1_BCSL/bao-cao-san-luong.html');
+        throw new Error('HTTP '+r.status+' '+t.slice(0,200)); });
+      return r.text().then(t=>{ if(t.trim().startsWith('<')) throw new Error('Apps Script không trả JSON. Kiểm tra GAS_URL, bản triển khai mới nhất và quyền truy cập "Bất kỳ ai".'); return JSON.parse(t); }); })
     .then(onData).catch(onErr);
 }
 document.getElementById('reload').onclick=()=>load(true);
