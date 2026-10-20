@@ -215,7 +215,7 @@
   (async () => {
     S = getSession();
     try { M = O.build(await O.fetchData(false)); $("state").hidden = true; }
-    catch (e) { $("state").innerHTML = `<div style="font-size:28px">⚠</div><div>${esc(e.message)}</div>`; return; }
+    catch (e) { $("state").innerHTML = O.cfg.GAS_URL ? `<div style="font-size:28px">⚠</div><div>${esc(e.message)}</div>` : O.setupHtml(); return; }
     if (!S) return showLogin();
     try { const r = await O.post({ action: "me", token: S.token }); S.user = r.user; afterLogin(); }
     catch (e) { S = null; setSession(null); showLogin(); }

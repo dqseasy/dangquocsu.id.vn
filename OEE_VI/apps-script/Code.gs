@@ -23,6 +23,7 @@ const CFG = {
   SESSION_SEC: 21600,     // phiên đăng nhập 6 giờ (tối đa của CacheService)
   MAX_BACK_DAYS: 31,      // người nhập liệu chỉ được nhập/sửa trong 31 ngày gần nhất
   MAX_FAILS: 20,          // khoá đăng nhập bằng khoá bí mật 15 phút khi sai quá số lần này
+  TZ_VN: 'Asia/Ho_Chi_Minh',
   ALL: 'TẤT CẢ',
   ADMIN: 'Quản trị'
 };
@@ -182,9 +183,10 @@ function save_(req) {
   // --- ngày ---
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(x.d || ''));
   if (!m) throw new Error('Ngày không hợp lệ.');
-  const day = new Date(+m[1], +m[2] - 1, +m[3]);
-  const dStr = Utilities.formatDate(day, tz, 'yyyy-MM-dd');
-  const today = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
+  // Ngày tạo theo múi giờ của sheet để ô ngày hiện đúng; "hôm nay" tính theo giờ Việt Nam
+  const dStr = m[0];
+  const day = Utilities.parseDate(dStr + ' 00:00', tz, 'yyyy-MM-dd HH:mm');
+  const today = Utilities.formatDate(new Date(), CFG.TZ_VN, 'yyyy-MM-dd');
   if (dStr > today) throw new Error('Không nhập số liệu cho ngày trong tương lai.');
   const back = (new Date(today) - new Date(dStr)) / 864e5;
   if (back > CFG.MAX_BACK_DAYS && user.role !== CFG.ADMIN) throw new Error('Chỉ được nhập/sửa số liệu trong ' + CFG.MAX_BACK_DAYS + ' ngày gần nhất. Liên hệ quản trị để sửa số liệu cũ hơn.');
@@ -256,7 +258,7 @@ function save_(req) {
     vals[C.sl] = sl; vals[C.p] = p; vals[C.r] = r; vals[C.note] = note;
     if (C.sp >= 0) vals[C.sp] = sp;
     if (C.src >= 0) vals[C.src] = 'Nhập web';
-    if (C.file >= 0) vals[C.file] = 'Web · ' + (user.email || user.name) + ' · ' + Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm');
+    if (C.file >= 0) vals[C.file] = 'Web · ' + (user.email || user.name) + ' · ' + Utilities.formatDate(new Date(), CFG.TZ_VN, 'dd/MM/yyyy HH:mm');
     writeRow_(sh, target, vals, H.length);
     fillFormulas_(sh, target, H.length, vals);
     if (C.key >= 0 && !sh.getRange(target, C.key + 1).getFormula()) sh.getRange(target, C.key + 1).setValue(key);

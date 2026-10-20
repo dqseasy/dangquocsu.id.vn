@@ -145,14 +145,14 @@
         <div class="big num">${pct(a.OEE)}</div>
         <div><span class="pill">${O.TONE_LBL[t]}</span> <span class="sub">Mục tiêu ${M.MT.OEE}%</span></div>
         <div class="sub">So với kỳ trước (${prevLbl()}): <b class="delta">${pr.n ? O.pts(a.OEE - pr.OEE) + " điểm" : "chưa có số liệu"}</b></div>
-        <div class="sub">Bình quân gia quyền theo ${fmt(a.hours)} giờ làm việc kế hoạch · ${fmt(a.n)} ca máy</div>
+        <div class="sub">Bình quân gia quyền theo ${fmt(a.hours, 1)} giờ chạy máy thực tế · ${fmt(a.n)} ca máy</div>
       </div>
       <div class="grid g3">
         ${["A", "P", "Q"].map(k => kpiCard(
           { A: "A – Khả dụng", P: "P – Hiệu suất", Q: "Q – Chất lượng" }[k], pct(a[k]),
           `MT ${M.MT[k]}% · kỳ trước ${pr.n ? pct(pr[k]) : "—"} ${pr.n ? delta(a[k] - pr[k]) : ""}`, O.tone(k, a[k], M.MT), bar(a[k], k))).join("")}
         ${kpiCard("Sản lượng tốt", fmt(a.good), `Tổng ${fmt(a.sl)} · phế ${fmt(a.p)} · làm lại ${fmt(a.r)}`)}
-        ${kpiCard("Thời gian chạy máy", fmt(a.run / 60, 1) + " giờ", `Kế hoạch ${fmt(a.hours, 1)} giờ · dừng ${fmt(a.stop)} phút`)}
+        ${kpiCard("Thời gian chạy máy", fmt(a.run / 60, 1) + " giờ", `Kế hoạch ${fmt(a.plan / 60, 1)} giờ · dừng ${fmt(a.stop)} phút`)}
         ${kpiCard("Ca OEE &lt; 60%", fmt(bad) + `<span class="muted" style="font-size:16px"> / ${fmt(R.length)}</span>`,
           R.length ? pct(bad / R.length * 100) + " số ca máy" : "", bad / Math.max(1, R.length) <= .05 ? "good" : bad / Math.max(1, R.length) <= .15 ? "warn" : "bad")}
       </div>`;
@@ -162,11 +162,11 @@
     const lines = M.lines.filter(l => base.some(r => r.c === l.c));
     const facs = M.facs.filter(f => base.some(r => r.f === f));
     $("ov-lines").innerHTML = lines.map(l => {
-      const rs = base.filter(r => r.c === l.c), x = O.agg(rs), tt = O.tone("OEE", x.OEE, M.MT), share = tot.plan ? x.plan / tot.plan * 100 : 0;
+      const rs = base.filter(r => r.c === l.c), x = O.agg(rs), tt = O.tone("OEE", x.OEE, M.MT), share = tot.run ? x.run / tot.run * 100 : 0;
       return `<button class="line-card ${st.c === l.c ? "on" : ""}" data-line="${esc(l.c)}">
         <div class="head"><div><div class="name">${esc(l.name)}</div><div class="w">${fmt(x.hours, 1)} giờ · ${fmt(share)}% tỷ trọng · ${x.n} ca máy</div></div>${pill(tt)}</div>
         <div class="oee num c-${tt}">${pct(x.OEE)}</div>
-        <div class="share" title="Tỷ trọng giờ làm việc"><i style="width:${share}%"></i></div>
+        <div class="share" title="Tỷ trọng giờ chạy máy"><i style="width:${share}%"></i></div>
         <div class="apq">${["A", "P", "Q"].map(k => `<span class="k">${k}</span>${bar(x[k], k)}<span class="v num">${pct(x[k])}</span>`).join("")}</div>
         <div class="split">${facs.map(f => { const y = O.agg(rs.filter(r => r.f === f));
           return `<div>${f}<b class="num ${y.n ? "c-" + O.tone("OEE", y.OEE, M.MT) : "c-na"}">${y.n ? pct(y.OEE) : "—"}</b>${y.n ? fmt(y.hours, 1) + " giờ" : "chưa có số liệu"}</div>`; }).join("")}</div>
@@ -175,7 +175,7 @@
         <div class="head"><div><div class="name">Tổng hợp tất cả chuyền</div><div class="w">${fmt(tot.hours, 1)} giờ · ${tot.n} ca máy</div></div>${pill(O.tone("OEE", tot.OEE, M.MT))}</div>
         <div class="oee num c-${O.tone("OEE", tot.OEE, M.MT)}">${pct(tot.OEE)}</div>
         <div class="apq">${["A", "P", "Q"].map(k => `<span class="k">${k}</span>${bar(tot[k], k)}<span class="v num">${pct(tot[k])}</span>`).join("")}</div>
-        <div class="w">= Σ(OEE chuyền × giờ chuyền) ÷ Σ giờ. Chuyền chạy nhiều giờ ảnh hưởng nhiều hơn tới OEE chung.</div>
+        <div class="w">= Σ(OEE chuyền × giờ chạy máy) ÷ Σ giờ chạy máy. Chuyền chạy nhiều giờ ảnh hưởng nhiều hơn tới OEE chung.</div>
       </div>`;
 
     // --- bảng ma trận ---
@@ -184,8 +184,8 @@
     const rowHtml = (name, rs, strong) => { const x = O.agg(rs);
       return `<tr${strong ? ' style="font-weight:800"' : ""}><td class="nw">${name}</td>${facs.map(f => cell(rs.filter(r => r.f === f))).join("")}
         <td class="r num"><b class="c-${O.tone("OEE", x.OEE, M.MT)}">${pct(x.OEE)}</b></td><td class="r num">${pct(x.A)}</td><td class="r num">${pct(x.P)}</td><td class="r num">${pct(x.Q)}</td>
-        <td class="r num">${fmt(x.hours, 1)}</td><td class="r num">${tot.plan ? pct(x.plan / tot.plan * 100, 0) : "—"}</td><td class="r num">${fmt(x.good)}</td></tr>`; };
-    $("ov-matrix").innerHTML = `<thead><tr><th>Chuyền</th>${facs.map(f => `<th class="r">OEE ${f}</th>`).join("")}<th class="r">OEE chung</th><th class="r">A</th><th class="r">P</th><th class="r">Q</th><th class="r">Giờ làm việc</th><th class="r">Tỷ trọng</th><th class="r">SL tốt</th></tr></thead>
+        <td class="r num">${fmt(x.hours, 1)}</td><td class="r num">${tot.run ? pct(x.run / tot.run * 100, 0) : "—"}</td><td class="r num">${fmt(x.good)}</td></tr>`; };
+    $("ov-matrix").innerHTML = `<thead><tr><th>Chuyền</th>${facs.map(f => `<th class="r">OEE ${f}</th>`).join("")}<th class="r">OEE chung</th><th class="r">A</th><th class="r">P</th><th class="r">Q</th><th class="r">Giờ chạy máy</th><th class="r">Tỷ trọng</th><th class="r">SL tốt</th></tr></thead>
       <tbody>${lines.map(l => rowHtml(esc(l.name), base.filter(r => r.c === l.c))).join("")}</tbody>
       <tfoot>${rowHtml("Tổng hợp (BQ gia quyền)", base, true).replace(/<tr[^>]*>/, "<tr>")}</tfoot>`;
 
@@ -199,7 +199,7 @@
       options: { plugins: { legend: { position: "bottom" }, valueLabels: { on: true, fmt: v => v.toFixed(1).replace(".", ",") }, tooltip: { callbacks: { label: c => c.dataset.label + ": " + pct(c.parsed.y) } } },
         scales: { y: pctAxis(), x: { grid: { display: false } } } } });
     $("ov-fac").innerHTML = `<div class="tbl-wrap" style="max-height:none"><table><thead><tr><th>Chỉ số</th>${fs.map(f => `<th class="r">${f}</th>`).join("")}<th class="r">Chênh</th></tr></thead><tbody>
-      ${[["OEE", "OEE"], ["A", "A – Khả dụng"], ["P", "P – Hiệu suất"], ["Q", "Q – Chất lượng"], ["hours", "Giờ làm việc"], ["good", "SL tốt"]].map(([k, l]) => {
+      ${[["OEE", "OEE"], ["A", "A – Khả dụng"], ["P", "P – Hiệu suất"], ["Q", "Q – Chất lượng"], ["hours", "Giờ chạy máy"], ["good", "SL tốt"]].map(([k, l]) => {
         const v = fs.map(f => O.agg(bf.filter(r => r.f === f))[k]); const isP = !["hours", "good"].includes(k);
         return `<tr><td>${l}</td>${v.map(x => `<td class="r num">${isP ? `<b class="c-${O.tone(k, x, M.MT)}">${pct(x)}</b>` : fmt(x)}</td>`).join("")}
           <td class="r num">${v.length === 2 && isP ? O.pts(v[0] - v[1]) : ""}</td></tr>`; }).join("")}</tbody></table></div>
@@ -306,7 +306,7 @@
       kpiCard("OEE " + f, `<span class="c-${O.tone("OEE", a.OEE, M.MT)}">${pct(a.OEE)}</span>`, `MT ${M.MT.OEE}% · kỳ trước ${pr.n ? pct(pr.OEE) : "—"} ${pr.n ? delta(a.OEE - pr.OEE) : ""}`, O.tone("OEE", a.OEE, M.MT), bar(a.OEE, "OEE")),
       ...["A", "P", "Q"].map(k => kpiCard({ A: "A – Khả dụng", P: "P – Hiệu suất", Q: "Q – Chất lượng" }[k], pct(a[k]), `MT ${M.MT[k]}% · kỳ trước ${pr.n ? pct(pr[k]) : "—"}`, O.tone(k, a[k], M.MT), bar(a[k], k))),
       kpiCard("Sản lượng tốt", fmt(a.good), `Tổng ${fmt(a.sl)} · phế ${fmt(a.p)} · làm lại ${fmt(a.r)}`),
-      kpiCard("Giờ làm việc", fmt(a.hours, 1), `Chạy ${fmt(a.run / 60, 1)} giờ · dừng ${fmt(a.stop)} phút`),
+      kpiCard("Giờ chạy máy", fmt(a.hours, 1), `Kế hoạch ${fmt(a.plan / 60, 1)} giờ · dừng ${fmt(a.stop)} phút`),
       kpiCard("Ca máy", fmt(a.n), `${R.filter(r => r.OEE < 60).length} ca OEE &lt; 60% · ${a.nP} ca thiếu NS chuẩn`),
       kpiCard("Dừng lớn nhất", a.top && a.top.v ? esc(a.top.l) : "—", a.top && a.top.v ? fmt(a.top.v) + " phút" : "Không có dừng máy ghi nhận")
     ].join("");
@@ -358,7 +358,7 @@
   };
   const flagStop = x => x.nkStop != null && Math.abs(x.stop - x.nkStop) > 5;
   const flagDef = x => x.nkDef != null && x.nkDef !== x.p + x.r;
-  const needsReview = x => x.OEE < 60 || x.P > 105 || !x.std || flagStop(x) || flagDef(x) || /chia/i.test(x.src);
+  const needsReview = x => x.OEE < 60 || x.P > 105 || !x.std || flagStop(x) || flagDef(x) || /chia|u[oớ]c t[ií]nh/i.test(x.src);
   function rawList() {
     const f = st.tab, inR = x => x.f === f && x.d >= st.from && x.d <= st.to && (!st.c || x.c === st.c) && (!st.m || x.m === st.m) && (!st.s || x.s === st.s);
     const src = st.raw === "gd" ? rows() : st.raw === "loi" ? M.defects.filter(inR) : M.stops.filter(inR);
@@ -375,7 +375,7 @@
     if (kind === 2) return `<span class="${k === "OEE" ? "c-" + O.tone("OEE", v, M.MT) : ""}">${pct(v)}</span>` + (k === "P" && v > 105 ? `<span class="flag t-warn" title="P > 105%: kiểm tra năng suất chuẩn">KT NS</span>` : "");
     if (k === "nkStop") return v == null ? `<span class="muted">—</span>` : `<span class="${flagStop(x) ? "flag t-bad" : ""}" title="${flagStop(x) ? "Lệch " + fmt(x.stop - v) + " phút so với tổng dừng" : ""}">${fmt(v)}</span>`;
     if (k === "nkDef") return v == null ? `<span class="muted">—</span>` : `<span class="${flagDef(x) ? "flag t-bad" : ""}" title="${flagDef(x) ? "Phế + làm lại = " + fmt(x.p + x.r) : ""}">${fmt(v)}</span>`;
-    if (k === "src") return /chia/i.test(v) ? `<span class="flag t-warn">${esc(v)}</span>` : esc(v);
+    if (k === "src") return /chia|u[oớ]c t[ií]nh/i.test(v) ?`<span class="flag t-warn">${esc(v)}</span>` : esc(v);
     if (kind === 1) return v === 0 && ["h", "k", "w", "e", "o"].includes(k) ? `<span class="muted">0</span>` : fmt(v, k === "min" ? 0 : 0);
     return esc(v);
   }
@@ -417,6 +417,9 @@
     const split = R.filter(r => /chia/i.test(r.src));
     if (split.length) out.push({ t: "bad", h: `${split.length}/${R.length} ca có sản lượng "chia tỷ lệ", không đếm riêng từng máy`, act: "Đếm sản lượng riêng từng máy (bộ đếm hoặc theo pallet).",
       d: "OEE so sánh giữa các máy của những ca này chưa dùng để kết luận được; OEE chuyền vẫn dùng được." });
+    const est = R.filter(r => /u[oớ]c t[ií]nh/i.test(r.src));
+    if (est.length) out.push({ t: "warn", h: `${est.length}/${R.length} ca có số liệu "Ước tính"`, act: "Thay bằng số đo thực tế khi có.",
+      d: "Máy: " + [...new Set(est.map(r => r.m))].slice(0, 8).join(", ") });
     const hiP = R.filter(r => r.P > 105);
     if (hiP.length) out.push({ t: "warn", h: `${hiP.length} ca có P > 105%`, act: "Kiểm tra lại năng suất chuẩn hoặc sản lượng nhập.",
       d: "Máy không thể chạy nhanh hơn chuẩn quá 5%. Ví dụ: " + hiP.slice(0, 5).map(r => `${r.f} ${O.dm(r.d)} ${r.s} ${r.m}`).join("; ") });
@@ -445,6 +448,7 @@
       ${[["Ca máy có số liệu", rs => fmt(rs.length)],
         ["Có NS chuẩn", rs => pct(rs.filter(r => r.std).length / rs.length * 100, 0)],
         ["Đếm riêng từng máy", rs => pct(rs.filter(r => !/chia/i.test(r.src)).length / rs.length * 100, 0)],
+        ["Số liệu đo thực tế (không ước tính)", rs => pct(rs.filter(r => !/u[oớ]c t[ií]nh/i.test(r.src)).length / rs.length * 100, 0)],
         ["Có nhật ký dừng máy", rs => pct(rs.filter(r => r.nkStop != null).length / rs.length * 100, 0)],
         ["Có nhật ký lỗi", rs => pct(rs.filter(r => r.nkDef != null).length / rs.length * 100, 0)],
         ["Có người nhập", rs => pct(rs.filter(r => r.u).length / rs.length * 100, 0)]]
@@ -463,8 +467,8 @@
     const gen = M.generatedAt ? new Date(M.generatedAt).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric" }) : "";
     $("meta").textContent = M.dates.length ? `Số liệu ${O.dmy(M.dates[0])} – ${O.dmy(M.dates.at(-1))} · ${fmt(M.facts.length)} ca máy · cập nhật ${gen}` : "Chưa có số liệu";
     $("foot").innerHTML = `Nguồn: Google Sheet <b>CSDL_OEE_Vi</b> (GD_OEE_CA, NK_LOI, NK_DUNG_MAY, danh mục DM_*). OEE ca = A × P × Q với A = TG chạy ÷ TG kế hoạch,
-      P = SL thực tế ÷ (TG chạy × NS chuẩn), Q = SL tốt ÷ SL thực tế. OEE máy, chuyền, nhà máy và OEE chung = bình quân gia quyền các ca theo giờ làm việc kế hoạch
-      (TG ca − nghỉ có kế hoạch). Mục tiêu: A ${M.MT.A}% · P ${M.MT.P}% · Q ${M.MT.Q}% · OEE ${M.MT.OEE}% (sheet CAU_HINH).`;
+      P = SL thực tế ÷ (TG chạy × NS chuẩn), Q = SL tốt ÷ SL thực tế. OEE máy, chuyền, nhà máy và OEE chung = bình quân gia quyền các ca theo giờ chạy máy thực tế
+      (TG ca − nghỉ có kế hoạch − tổng dừng). Mục tiêu: A ${M.MT.A}% · P ${M.MT.P}% · Q ${M.MT.Q}% · OEE ${M.MT.OEE}% (sheet CAU_HINH).`;
   }
 
   // ===================== TẢI DỮ LIỆU =====================
@@ -478,7 +482,8 @@
       $("state").hidden = true; renderMeta(); render();
       if (fresh) toast("Đã cập nhật số liệu mới nhất.");
     } catch (e) {
-      if (!M) { $("state").innerHTML = `<div style="font-size:28px">⚠</div><div>${esc(e.message)}</div><p><button class="btn" onclick="location.reload()">Thử lại</button></p>`; }
+      if (!O.cfg.GAS_URL) { $("state").innerHTML = O.setupHtml(); $("meta").textContent = "Chưa kết nối dữ liệu"; }
+      else if (!M) { $("state").innerHTML =`<div style="font-size:28px">⚠</div><div>${esc(e.message)}</div><p><button class="btn" onclick="location.reload()">Thử lại</button></p>`; }
       else toast(e.message, true);
     } finally { busy = false; $("btn-refresh").disabled = false; }
   }

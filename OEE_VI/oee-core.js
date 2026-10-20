@@ -1,6 +1,6 @@
 /* Lõi dùng chung: gọi API Apps Script, chuẩn hoá dữ liệu CSDL_OEE_Vi, tính OEE.
  * Quy ước tổng hợp: A, P, Q, OEE của mọi nhóm (máy, chuyền, nhà máy, toàn bộ) = bình quân gia quyền
- * các ca, trọng số = thời gian làm việc kế hoạch (TG ca − nghỉ có KH). */
+ * các ca, trọng số = thời gian chạy máy thực tế (TG ca − nghỉ có KH − tổng dừng). */
 (function () {
   const CFG = window.OEE_CONFIG || {};
   const O = window.OEE = { cfg: CFG };
@@ -9,10 +9,13 @@
   O.fetchData = async function (fresh) {
     if (!CFG.GAS_URL) throw new Error("Chưa cấu hình GAS_URL trong OEE_VI/config.js.");
     const url = CFG.GAS_URL + (CFG.GAS_URL.includes("?") ? "&" : "?") + "action=data" + (fresh ? "&fresh=1&t=" + Date.now() : "");
-    let r;
-    try { r = await fetch(url, { cache: "no-store" }); }
-    catch (e) { throw new Error("Không kết nối được máy chủ dữ liệu. Kiểm tra mạng rồi bấm Làm mới."); }
-    const txt = await r.text();
+    let r, txt;
+    for (let i = 0; i < 2; i++) {   // Apps Script đôi khi trả lỗi thoáng qua → thử lại 1 lần
+      try { r = await fetch(url, { cache: "no-store" }); txt = await r.text(); }
+      catch (e) { if (i) throw new Error("Không kết nối được máy chủ dữ liệu. Kiểm tra mạng rồi bấm Làm mới."); continue; }
+      if (r.ok && txt.trim().startsWith("{")) break;
+      await new Promise(ok => setTimeout(ok, 1200));
+    }
     let j; try { j = JSON.parse(txt); } catch (e) { throw new Error("Máy chủ dữ liệu không trả JSON (HTTP " + r.status + "). Kiểm tra bản triển khai Web App và quyền truy cập \"Bất kỳ ai\"."); }
     if (j.error) throw new Error(j.error);
     return j;
@@ -27,12 +30,24 @@
     return j;
   };
 
+  // Màn hình hướng dẫn khi chưa nối với Google Sheet
+  O.setupHtml = () => `<div style="max-width:640px;margin:0 auto;text-align:left" class="card">
+    <h2 style="margin-bottom:8px">Chưa kết nối Google Sheet CSDL_OEE_Vi</h2>
+    <p class="muted">Trang cần link Web App Apps Script để đọc dữ liệu. Quản trị làm một lần:</p>
+    <ol style="line-height:1.7;padding-left:20px">
+      <li>Mở sheet <b>CSDL_OEE_Vi</b> → <b>Tiện ích mở rộng → Apps Script</b>, dán file <code>OEE_VI/apps-script/Code.gs</code>.</li>
+      <li>Chạy hàm <b>caiDat</b> một lần (cấp quyền khi được hỏi).</li>
+      <li><b>Triển khai → Bản triển khai mới → Ứng dụng web</b>: thực thi với tư cách <b>Tôi</b>, quyền truy cập <b>Bất kỳ ai</b> → copy link <code>…/exec</code>.</li>
+      <li>Dán link vào <code>GAS_URL</code> trong <code>OEE_VI/config.js</code>, commit và push lên Cloudflare.</li>
+    </ol>
+    <p class="muted small">Chi tiết: OEE_VI/HUONG_DAN.md</p></div>`;
+
   // ---------------- tiện ích ----------------
   O.norm = s => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase().replace(/\s+/g, " ").trim();
   O.esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   O.fmt = (n, d = 0) => isFinite(n) ? Number(n).toLocaleString("vi-VN", { minimumFractionDigits: d, maximumFractionDigits: d }) : "—";
   O.pct = (n, d = 1) => isFinite(n) ? Number(n).toFixed(d).replace(".", ",") + "%" : "—";
-  O.pts = n => isFinite(n) ? (n > 0 ? "+" : n < 0 ? "−" : "±") + Math.abs(n).toFixed(1).replace(".", ",") : "—";
+  O.pts = n => isFinite(n) ? (Math.abs(n) < 0.05 ? "±" : n > 0 ? "+" : "−") + Math.abs(n).toFixed(1).replace(".", ",") : "—";
   O.dmy = d => d ? d.slice(8, 10) + "/" + d.slice(5, 7) + "/" + d.slice(0, 4) : "";
   O.dm = d => d ? d.slice(8, 10) + "/" + d.slice(5, 7) : "";
   O.isoWeek = d => { const t = new Date(d + "T00:00:00Z"), day = (t.getUTCDay() + 6) % 7; t.setUTCDate(t.getUTCDate() - day + 3);
@@ -71,7 +86,8 @@
 
     // Chuyền
     const ch = table(S.DM_CHUYEN), cc = ch.col("ma chuyen"), cnn = ch.col("ten chuyen"), cg = ch.col("ghi chu");
-    M.lines = ch.rows.filter(r => r[cc]).map(r => ({ c: String(r[cc]).trim(), name: String(r[cnn] || r[cc]).trim(), note: String(r[cg] || "") }));
+    // mã chuyền hợp lệ: chữ/số/gạch dưới, bỏ các dòng ghi chú
+    M.lines = ch.rows.filter(r => /^[\w-]+$/.test(String(r[cc] || "").trim())).map(r => ({ c: String(r[cc]).trim(), name: String(r[cnn] || r[cc]).trim(), note: String(r[cg] || "") }));
     M.lineName = Object.fromEntries(M.lines.map(l => [l.c, l.name]));
 
     // Máy
@@ -183,7 +199,7 @@
     return { plan, stop, run, ideal, good, A, P, Q, OEE: A * P * Q / 1e4 };
   };
 
-  // ---------------- tổng hợp nhiều ca: bình quân gia quyền theo giờ làm việc ----------------
+  // ---------------- tổng hợp nhiều ca: bình quân gia quyền theo giờ chạy máy thật ----------------
   O.agg = function (rows) {
     const a = { n: rows.length, t: 0, b: 0, h: 0, k: 0, w: 0, e: 0, o: 0, sl: 0, p: 0, r: 0, plan: 0, stop: 0, run: 0, good: 0, ideal: 0,
       speed: 0, defTime: 0, nP: 0 };
@@ -192,11 +208,11 @@
       ["t", "b", "h", "k", "w", "e", "o", "sl", "p", "r", "plan", "stop", "run", "good"].forEach(f => a[f] += x[f] || 0);
       if (x.std) { a.ideal += x.ideal || 0; a.speed += Math.max(0, x.run - x.sl * 60 / x.std); a.defTime += (x.p + x.r) * 60 / x.std; }
       else a.nP++;
-      const wt = x.plan;
+      const wt = x.run;   // trọng số = thời gian chạy máy thực tế
       if (wt > 0) ["A", "P", "Q", "OEE"].forEach(k => { if (isFinite(x[k])) { W[k][0] += x[k] * wt; W[k][1] += wt; } });
     });
     ["A", "P", "Q", "OEE"].forEach(k => a[k] = W[k][1] ? W[k][0] / W[k][1] : NaN);
-    a.hours = a.plan / 60;
+    a.hours = a.run / 60;   // giờ chạy máy = trọng số
     a.rate = a.run ? a.sl / a.run * 60 : NaN;
     a.losses = O.LOSS.map(([f, l]) => ({ f, l, v: a[f] }));
     a.top = a.losses.slice().sort((x, y) => y.v - x.v)[0];

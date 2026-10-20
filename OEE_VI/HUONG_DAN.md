@@ -60,7 +60,7 @@ Máy chủ kiểm tra token Google (đúng Client ID, email đã xác minh) rồ
 
 ## Cách tính OEE trên báo cáo
 - OEE từng ca = A × P × Q (A = TG chạy ÷ TG kế hoạch; P = SL ÷ (TG chạy × NS chuẩn); Q = SL tốt ÷ SL), khớp công thức trong GD_OEE_CA.
-- **OEE máy, chuyền, nhà máy và OEE chung = bình quân gia quyền các ca, trọng số = giờ làm việc kế hoạch** (TG ca − nghỉ có KH). A, P, Q tổng hợp cũng tính cùng cách.
+- **OEE máy, chuyền, nhà máy và OEE chung = bình quân gia quyền các ca, trọng số = giờ chạy máy thực tế** (TG ca − nghỉ có KH − tổng dừng). A, P, Q tổng hợp cũng tính cùng cách. Ca dừng máy cả ca (giờ chạy = 0) không có trọng số.
 - Mục tiêu A, P, Q, OEE đọc từ sheet **CAU_HINH**. Danh mục máy, chuyền, ca, lỗi đọc từ các sheet **DM_\***, nên thêm máy hoặc chuyền mới chỉ cần sửa sheet.
 
 ## Ghi chú bảo mật
