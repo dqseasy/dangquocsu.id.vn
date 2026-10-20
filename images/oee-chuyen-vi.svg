@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" font-family="Inter, Segoe UI, Arial, sans-serif">
+  <rect width="800" height="450" fill="#F3F7F4"/>
+  <rect width="800" height="92" fill="#0F3D16"/>
+  <text x="40" y="42" fill="#A8D49E" font-size="16" font-weight="700" letter-spacing="2">P.KTCL · NS1 – NS2</text>
+  <text x="40" y="72" fill="#fff" font-size="26" font-weight="800">Báo cáo OEE chuyền vỉ &amp; kệ hoa</text>
+  <rect x="40" y="120" width="250" height="290" rx="16" fill="#0F3D16"/>
+  <path d="M85 270 A80 80 0 0 1 245 270" fill="none" stroke="#2E5B35" stroke-width="18" stroke-linecap="round"/>
+  <path d="M85 270 A80 80 0 0 1 222 213" fill="none" stroke="#A8D49E" stroke-width="18" stroke-linecap="round"/>
+  <text x="165" y="262" fill="#fff" font-size="40" font-weight="800" text-anchor="middle">78,4%</text>
+  <text x="165" y="320" fill="#A8D49E" font-size="16" font-weight="700" text-anchor="middle">OEE CHUNG</text>
+  <text x="165" y="350" fill="#D6E8D9" font-size="14" text-anchor="middle">BQ gia quyền theo giờ</text>
+  <g font-size="14" font-weight="700" fill="#16241A">
+    <rect x="320" y="120" width="440" height="290" rx="16" fill="#fff" stroke="#D8E5DB"/>
+    <text x="345" y="155">OEE theo chuyền</text>
+    <line x1="345" y1="380" x2="740" y2="380" stroke="#D8E5DB"/>
+    <line x1="345" y1="220" x2="740" y2="220" stroke="#B42318" stroke-width="2" stroke-dasharray="8 6"/>
+    <rect x="370" y="190" width="40" height="190" rx="4" fill="#0F3D16"/><rect x="415" y="182" width="40" height="198" rx="4" fill="#4E9A43"/>
+    <rect x="495" y="195" width="40" height="185" rx="4" fill="#0F3D16"/><rect x="540" y="200" width="40" height="180" rx="4" fill="#4E9A43"/>
+    <rect x="620" y="210" width="40" height="170" rx="4" fill="#0F3D16"/><rect x="665" y="230" width="40" height="150" rx="4" fill="#C08A2E"/>
+  </g>
+</svg>

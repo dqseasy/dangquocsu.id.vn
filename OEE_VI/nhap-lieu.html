@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nhập liệu OEE</title>
+<meta name="description" content="Nhập sổ sản lượng và lỗi hàng ngày theo ca cho OEE chuyền vỉ và kệ hoa NS1 – NS2.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/images/logo-nghia-son.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="oee.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <img src="/images/logo-nghia-son.png" alt="Nghĩa Sơn">
+      <div>
+        <div class="eyebrow">Phòng Kỹ thuật · P.KTCL</div>
+        <h1>Nhập sổ sản lượng &amp; lỗi theo ca</h1>
+        <div class="meta" id="who">Chưa đăng nhập</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn ghost" id="btn-logout" hidden>Đăng xuất</button>
+      <a class="btn primary" href="./">← Báo cáo OEE</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" style="padding-top:20px">
+
+  <!-- ============ ĐĂNG NHẬP ============ -->
+  <section id="login" class="card" style="max-width:460px;margin:40px auto" hidden>
+    <h2>Đăng nhập để nhập liệu</h2>
+    <p class="muted small">Chỉ tài khoản được P.KTCL cấp quyền mới ghi được số liệu vào CSDL_OEE_Vi.</p>
+    <div id="g-wrap" hidden>
+      <div id="g-btn" style="margin:14px 0"></div>
+      <div class="muted small" style="text-align:center;margin:6px 0">— hoặc —</div>
+    </div>
+    <form id="key-form" style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+      <label class="f"><span>Khoá bí mật của nhà máy / người nhập
+        </span><input type="password" id="key" autocomplete="current-password" required minlength="6" placeholder="Nhập khoá được cấp"></label>
+      <button class="btn primary" type="submit" id="btn-login" style="justify-content:center">Đăng nhập</button>
+    </form>
+    <p class="msg t-bad" id="login-msg" hidden style="margin-top:12px"></p>
+  </section>
+
+  <div id="state" class="state"><div class="spin"></div><div id="state-msg">Đang tải danh mục…</div></div>
+
+  <!-- ============ FORM ============ -->
+  <div id="app" class="layout-2" hidden>
+    <form id="form" class="card" novalidate>
+      <div class="card-h"><h2>Sổ ca: sản lượng, dừng máy, lỗi</h2><p id="edit-flag"></p></div>
+
+      <h3 style="margin:4px 0 10px">1. Thông tin ca</h3>
+      <div class="form-grid">
+        <label class="f"><span>Nhà máy <span class="req">*</span></span><select id="i-f" required></select></label>
+        <label class="f"><span>Ngày <span class="req">*</span></span><input type="date" id="i-d" required></label>
+        <label class="f"><span>Ca <span class="req">*</span></span><select id="i-s" required></select></label>
+        <label class="f"><span>Chuyền <span class="req">*</span></span><select id="i-c" required></select></label>
+        <label class="f"><span>Máy <span class="req">*</span></span><select id="i-m" required></select></label>
+        <label class="f"><span>Mã sản phẩm</span><select id="i-sp"></select></label>
+      </div>
+      <p class="note" id="missing"></p>
+
+      <h3 style="margin:18px 0 10px">2. Thời gian (phút)</h3>
+      <div class="form-grid">
+        <label class="f"><span>TG ca <span class="req">*</span></span><input type="number" id="i-t" min="1" max="1440" step="1" required inputmode="numeric"></label>
+        <label class="f"><span>Nghỉ có kế hoạch</span><input type="number" id="i-b" min="0" max="1440" step="1" inputmode="numeric"></label>
+        <label class="f"><span>Hỏng máy / sự cố</span><input type="number" id="i-h" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+        <label class="f"><span>Thay dao, chỉnh máy</span><input type="number" id="i-k" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+        <label class="f"><span>Chờ phôi, vật tư</span><input type="number" id="i-w" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+        <label class="f"><span>Mất điện / khí nén</span><input type="number" id="i-e" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+        <label class="f"><span>Dừng khác</span><input type="number" id="i-o" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+      </div>
+
+      <h3 style="margin:18px 0 10px">3. Sản lượng và lỗi</h3>
+      <div class="form-grid">
+        <label class="f"><span>Tổng sản lượng <span class="req">*</span></span><input type="number" id="i-sl" min="0" step="1" required inputmode="numeric"></label>
+        <label class="f"><span>Phế phẩm</span><input type="number" id="i-p" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+        <label class="f"><span>Hàng làm lại</span><input type="number" id="i-r" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+      </div>
+      <div style="margin:12px 0 6px;display:flex;gap:16px;flex-wrap:wrap" class="small">
+        <label><input type="radio" name="dm" value="detail" checked> Ghi chi tiết theo mã lỗi (tự cộng phế / làm lại, ghi vào NK_LOI)</label>
+        <label><input type="radio" name="dm" value="total"> Chỉ nhập tổng phế / làm lại</label>
+      </div>
+      <div id="def-box">
+        <div class="tbl-wrap" style="max-height:none"><table><thead><tr><th style="cursor:default">Mã lỗi</th><th class="r" style="cursor:default;width:120px">Số lượng</th><th style="cursor:default">Mô tả</th><th style="cursor:default;width:44px"></th></tr></thead><tbody id="def-rows"></tbody></table></div>
+        <button type="button" class="btn" id="def-add" style="margin-top:8px">+ Thêm dòng lỗi</button>
+      </div>
+      <label class="f" style="margin-top:14px"><span>Nguyên nhân chính / ghi chú <span class="req" id="note-req" hidden>* bắt buộc khi OEE &lt; 60%</span></span><textarea id="i-note" rows="2" maxlength="500" placeholder="VD: chờ phôi từ chuyền bào 40 phút do thiếu người"></textarea></label>
+
+      <h3 style="margin:18px 0 10px">Kết quả tính tạm</h3>
+      <div class="calc-row" id="calc"></div>
+      <p class="msg" id="form-msg" hidden style="margin-top:12px"></p>
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+        <button class="btn primary" type="submit" id="btn-save">Lưu vào CSDL_OEE_Vi</button>
+        <button class="btn" type="button" id="btn-clear">Nhập ca mới</button>
+      </div>
+    </form>
+
+    <aside class="card">
+      <div class="card-h"><h3>Đã nhập gần đây</h3><p id="recent-note"></p></div>
+      <div class="tbl-wrap"><table id="recent"></table></div>
+      <p class="note">Bấm một dòng để mở lại và sửa. Lưu lại cùng nhà máy · ngày · ca · máy · mã SP sẽ ghi đè dòng cũ.</p>
+    </aside>
+  </div>
+</main>
+
+<script src="config.js"></script>
+<script src="oee-core.js"></script>
+<script src="nhap-lieu.js"></script>
+</body>
+</html>
