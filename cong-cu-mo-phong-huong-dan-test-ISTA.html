@@ -151,7 +151,7 @@
                                     <option value="ISTA_2A">ISTA 2A – Partial Simulation (≤ 68 kg)</option>
                                     <option value="ISTA_2B">ISTA 2B – Partial Simulation (&gt; 68 kg)</option>
                                     <option value="ISTA_2C" selected>ISTA 2C – Furniture Packages (Nội thất)</option>
-                                    <option value="ISTA_3A">ISTA 3A – Parcel Delivery (≤ 68 kg)</option>
+                                    <option value="ISTA_3A">ISTA 3A – Parcel Delivery (≤ 70 kg)</option>
                                     <option value="AMZ_A">ISTA 6-Amazon.com SIOC – Type A (&lt; 23 kg)</option>
                                     <option value="AMZ_B">ISTA 6-Amazon.com SIOC – Type B (23 – 45 kg)</option>
                                 </select>
@@ -160,9 +160,40 @@
                             <div class="mb-3" id="grp2cLevel">
                                 <label class="form-label fw-semibold" for="level2C">Mức thử 2C (theo kênh phân phối)</label>
                                 <select id="level2C" class="form-select">
-                                    <option value="0" selected>Level I – khắc nghiệt nhất</option>
-                                    <option value="1">Level II</option>
-                                    <option value="2">Level III – nhẹ nhất</option>
+                                    <option value="0" selected>Level One – chuyển phát nhanh (small parcel)</option>
+                                    <option value="1">Level Two – xe tải hàng tổng hợp</option>
+                                    <option value="2">Level Three – nhà vận chuyển nội thất chuyên dụng</option>
+                                </select>
+                                <div class="form-text">Không rõ kênh phân phối → dùng Level One. Nhiều kênh → dùng Level có số nhỏ nhất.</div>
+                            </div>
+
+                            <div class="mb-3" id="grpShock2C">
+                                <label class="form-label fw-semibold" for="shock2C">Phương pháp va đập 2C</label>
+                                <select id="shock2C" class="form-select">
+                                    <option value="drop" selected>Thả rơi tự do (mặc định)</option>
+                                    <option value="exc1">Exception One – va đập dốc / ngang</option>
+                                    <option value="exc2">Exception Two – kiện có đế skid / pallet</option>
+                                </select>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="orient2C">
+                                    <label class="form-check-label small" for="orient2C">Có ký hiệu định hướng (This side up) hoặc đặt trên skid / pallet</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" id="grpNoFace1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="noFace1">
+                                    <label class="form-check-label small" for="noFace1">Không thử mặt 1 (kiện có skid / pallet, hoặc lật úp không an toàn) → va đập 4 mặt đứng + thả xoay cạnh</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" id="grpCorner">
+                                <label class="form-label fw-semibold" for="firstCorner">Góc mặt 3 dễ vỡ nhất (lần thả 1)</label>
+                                <select id="firstCorner" class="form-select">
+                                    <option value="2-3-5" selected>Góc 2-3-5 (mặc định khi chưa biết)</option>
+                                    <option value="3-4-5">Góc 3-4-5</option>
+                                    <option value="2-3-6">Góc 2-3-6</option>
+                                    <option value="3-4-6">Góc 3-4-6</option>
                                 </select>
                             </div>
 
@@ -171,13 +202,14 @@
                                 <select id="pkgType" class="form-select">
                                     <option value="auto" selected>Tự nhận diện theo kích thước</option>
                                     <option value="standard">Standard (tiêu chuẩn)</option>
+                                    <option value="small">Small (nhỏ – chỉ 3A)</option>
                                     <option value="flat">Flat (dẹt)</option>
                                     <option value="elongated">Elongated (dài)</option>
                                 </select>
                             </div>
 
                             <div class="mb-3" id="grpCritical">
-                                <label class="form-label fw-semibold" for="criticalEl">Hướng dễ hư hỏng nhất (lần thả 16)</label>
+                                <label class="form-label fw-semibold" for="criticalEl">Mặt dễ hư hỏng nhất (lần thả 16 – thả phẳng)</label>
                                 <select id="criticalEl" class="form-select"></select>
                             </div>
 
@@ -303,7 +335,7 @@
                             </table>
                         </div>
                         <div class="small text-muted mt-3">
-                            <p class="mb-1"><b>Ghi chú kỹ thuật:</b> Độ cao thả đo từ điểm thấp nhất của kiện (điểm va chạm) tới bề mặt va chạm. Khi thả cạnh / góc, trọng tâm nằm thẳng đứng phía trên cạnh / góc đó (ASTM D5276). V va chạm lý thuyết = √(2gh), năng lượng = m·g·h; riêng thả xoay cạnh tính theo bảo toàn năng lượng quay quanh cạnh tựa. Mô phỏng dùng động lực học vật rắn (cannon-es) nên chuyển động sau va chạm chỉ mang tính minh hoạ.</p>
+                            <p class="mb-1"><b>Ghi chú kỹ thuật:</b> Độ cao thả đo từ điểm thấp nhất của kiện (điểm va chạm) tới bề mặt va chạm; riêng lần thả lên hazard của 3A đo tới sàn, không tới khối hazard. Khi thả cạnh / góc, trọng tâm nằm thẳng đứng phía trên cạnh / góc đó (ASTM D5276). Thả xoay cạnh kê cạnh đối diện trên khối đỡ 95 mm (90–100 mm theo ISTA 3A). V va chạm lý thuyết = √(2gh), năng lượng = m·g·h; riêng thả xoay cạnh và lật đổ tính theo bảo toàn năng lượng quay quanh cạnh tựa. Mô phỏng dùng động lực học vật rắn (cannon-es) nên chuyển động sau va chạm chỉ mang tính minh hoạ.</p>
                             <p class="mb-1"><b>Lưu ý:</b> Công cụ chỉ phục vụ tham khảo &amp; đào tạo. Trước khi thử nghiệm chứng nhận, hãy đối chiếu với bản procedure ISTA hiện hành (mua tại <a href="https://ista.org" target="_blank" rel="noopener">ista.org</a>). Các giá trị được đánh dấu <span class="ista-tag high" style="margin:0">CẦN XÁC NHẬN</span> chưa được kiểm chứng bằng tài liệu gốc.</p>
                             <p class="mb-0"><b>Nguồn đối chiếu:</b>
                                 <a href="https://www.ista.org/docs/1Boverview.pdf" target="_blank" rel="noopener">ISTA 1B overview</a> ·
@@ -311,6 +343,8 @@
                                 <a href="https://ista.org/docs/2Boverview.pdf" target="_blank" rel="noopener">2B overview</a> ·
                                 <a href="https://www.ista.org/docs/2Coverview.pdf" target="_blank" rel="noopener">2C overview</a> ·
                                 <a href="https://www.atlanticpkg.com/wp-content/uploads/2025/07/ISTA-Drop-Testing-Info-Sheet.pdf" target="_blank" rel="noopener">ISTA 1A / 3A drop sheet</a> ·
+                                <a href="https://www.ista.org/docs/3Aoverview.pdf" target="_blank" rel="noopener">ISTA 3A-2018 overview</a> ·
+                                <a href="https://u.dianyuan.com/bbs/u/44/1155520137.pdf" target="_blank" rel="noopener">ISTA 3A-2004 procedure</a> ·
                                 <a href="https://assets.aboutamazon.com/88/c8/19bf65324e2a90f7f843e184c230/ista-6-amazon.com_SIOC-A_External_Blank_4.pdf" target="_blank" rel="noopener">Amazon SIOC-A test report</a>
                             </p>
                         </div>
@@ -407,12 +441,32 @@
         const H_2A = [970, 810, 660, 510, 310];
         function bracketIndex(lb) { return BRACKETS.findIndex(b => lb < b.maxLb); }
 
-        // ISTA 2C: [Level I, Level II, Level III] theo nhóm trọng lượng
+        // ISTA 2C: Drop Chart [Level One, Two, Three] và vận tốc va đập Exception One (m/s) theo nhóm trọng lượng
         const H_2C = [
-            { maxLb: 50, label: '< 50 lb (< 23 kg)', h: [760, 610, 460] },
-            { maxLb: 100, label: '50 – 100 lb (23 – 45 kg)', h: [510, 410, 310] },
-            { maxLb: Infinity, label: '100 – 150 lb (45 – 68 kg)', h: [310, 250, 200] }
+            { label: '< 50 lb (< 23 kg)', h: [760, 610, 460], v: [3.9, 3.5, 3.0] },
+            { label: '50 – 100 lb (23 – 45 kg)', h: [510, 410, 310], v: [3.2, 2.8, 2.5] },
+            { label: '> 100 lb (> 45 kg)', h: [310, 250, 200], v: [2.5, 2.2, 2.0] }
         ];
+        const row2C = (lb) => H_2C[lb < 50 ? 0 : lb <= 100 ? 1 : 2];
+        const LEVEL_2C = ['One', 'Two', 'Three'];
+        const LEVEL_2C_NAME = ['chuyển phát nhanh (small parcel)', 'xe tải hàng tổng hợp', 'nhà vận chuyển nội thất chuyên dụng'];
+        // Rung 2C: tỉ trọng hàng xếp chồng (kg/m³) và Grms của phổ theo Level
+        const TL_DENSITY_2C = [190, 160, 130];
+        const GRMS_2C = ['0,51 Grms', '0,54 Grms (xe tải lò xo thép)', '0,28 Grms (xe tải giảm xóc khí – nếu không dùng air-ride thì dùng phổ Level Two)'];
+        // Exception Two: thả xoay cạnh – độ cao & khối đỡ theo Level
+        const ROT_2C = [{ h: 200, s: 190, sText: '180 – 200 mm' }, { h: 200, s: 95, sText: '90 – 100 mm' }, { h: 100, s: 95, sText: '90 – 100 mm' }];
+
+        // Tải đè rung 2C cho một trục: TL = tỉ trọng × (chiều cao chồng − kích thước đứng) × 2 kích thước còn lại.
+        // Kiện nhỏ & nhẹ (≤ 0,06 m³ và < 14 kg) ở Level Two/Three dùng chiều cao chồng 1,4 m thay vì 2,7 m.
+        // Tối đa: mặt 3 xuống 180 kg (cao ≤ 1,5 m) hoặc 55 kg (cao > 1,5 m); mặt 4 / mặt 6 xuống 55 kg.
+        function topLoad2C(d, kg, lvl, vertical, a, b, face) {
+            const m = (x) => x / 1000;
+            const smallLight = m(d.L) * m(d.W) * m(d.H) <= 0.06 && kg < 14;
+            const stack = smallLight && lvl > 0 ? 1.4 : 2.7;
+            const tl = Math.max(0, TL_DENSITY_2C[lvl] * (stack - m(vertical)) * m(a) * m(b));
+            const max = face === 3 ? (d.H <= 1500 ? 180 : 55) : 55;
+            return { tl: Math.round(Math.min(tl, max) * 10) / 10, capped: tl > max };
+        }
 
         // ISTA 3A / 6-Amazon: 17 lần thả (9 trước rung, 8 sau rung)
         const SEQ_3A_PRE = [[3, 4], [3, 6], [4, 6], [3, 4, 6], [2, 3, 5], [2, 3], [1, 2], [3], [3]];
@@ -422,60 +476,96 @@
         // 3. THUẬT TOÁN LẬP CHƯƠNG TRÌNH THỬ
         // =====================================================================
 
-        // Trình tự 10 lần thả (1A, 2A, 2C): góc 2-3-5 → 3 cạnh từ ngắn đến dài → 3 cặp mặt từ nhỏ đến lớn
-        function sequence10(d, h) {
+        // Trình tự 10 lần thả (1A, 2A, 2C): góc mặt 3 dễ vỡ nhất (mặc định 2-3-5) → 3 cạnh xuất phát từ góc đó
+        // từ ngắn đến dài → 3 cặp mặt từ nhỏ đến lớn
+        function sequence10(d, h, corner = [2, 3, 5]) {
+            const side = corner.find(f => f === 2 || f === 4), end = corner.find(f => f === 5 || f === 6);
+            const cName = corner.join('-');
+            const sorted = (a) => [...a].sort((x, y) => x - y);
             const edges = [
-                { el: [2, 3], len: d.L },
-                { el: [3, 5], len: d.W },
-                { el: [2, 5], len: d.H }
+                { el: sorted([side, 3]), len: d.L },
+                { el: sorted([3, end]), len: d.W },
+                { el: sorted([side, end]), len: d.H }
             ].sort((a, b) => a.len - b.len);
+            const er = ['ngắn nhất', 'trung bình', 'dài nhất'];
+
+            const drops = [{ el: sorted(corner), h, note: `Góc dễ vỡ nhất trên mặt 3 (đang chọn ${cName}; mặc định 2-3-5 khi chưa biết). Trọng tâm thẳng đứng trên góc.` }];
+            edges.forEach((e, i) => drops.push({
+                el: e.el, h,
+                note: `Cạnh ${er[i]} xuất phát từ góc ${cName} (dài ${e.len} mm). Trọng tâm thẳng đứng trên cạnh.`
+            }));
+            return drops.concat(faceSequence(d, h));
+        }
+
+        // 6 lần thả phẳng: cặp mặt nhỏ nhất → trung bình → lớn nhất (mỗi cặp: một mặt rồi mặt đối diện)
+        function faceSequence(d, h, extra = {}) {
             const pairs = [
                 { el: [5, 6], area: d.W * d.H, size: `${d.W}×${d.H}` },
                 { el: [2, 4], area: d.L * d.H, size: `${d.L}×${d.H}` },
                 { el: [3, 1], area: d.L * d.W, size: `${d.L}×${d.W}` }
             ].sort((a, b) => a.area - b.area);
-            const er = ['ngắn nhất', 'trung bình', 'dài nhất'];
             const fr = ['nhỏ nhất', 'trung bình', 'lớn nhất'];
-
-            const drops = [{ el: [2, 3, 5], h, note: 'Góc dễ vỡ nhất trên mặt 3 (mặc định góc 2-3-5). Trọng tâm thẳng đứng trên góc.' }];
-            edges.forEach((e, i) => drops.push({
-                el: e.el, h,
-                note: `Cạnh ${er[i]} xuất phát từ góc 2-3-5 (dài ${e.len} mm). Trọng tâm thẳng đứng trên cạnh.`
-            }));
+            const drops = [];
             pairs.forEach((p, i) => p.el.forEach((f, j) => drops.push({
-                el: [f], h,
+                el: [f], h, ...extra,
                 note: `${j === 0 ? 'Mặt' : 'Mặt đối diện của cặp'} ${fr[i]} (${FACES[f].name}, ${p.size} mm), thả phẳng.`
             })));
             return drops;
         }
 
-        // Nhận diện loại kiện ISTA 3A (Standard / Flat / Elongated)
-        function classify3A(d) {
+        // Nhận diện loại kiện theo định nghĩa ISTA 3A (Small / Flat / Elongated / Standard).
+        // Kiện vừa Flat vừa Elongated được xếp vào Elongated.
+        function classify3A(d, kg) {
             const s = [d.L, d.W, d.H].sort((a, b) => a - b);
             const vol = d.L * d.W * d.H / 1000; // cm³
-            if (s[2] >= 914 && s[1] <= 0.2 * s[2] && s[0] <= 0.2 * s[2]) return 'elongated';
+            if (s[2] >= 900 && s[1] <= 0.2 * s[2] && s[0] <= 0.2 * s[2]) return 'elongated';
             if (s[0] <= 200 && s[1] >= 4 * s[0] && vol >= 13000) return 'flat';
+            if (vol < 13000 && s[2] <= 350 && kg <= 4.5) return 'small';
             return 'standard';
         }
-        const PKG_NAME = { standard: 'Standard', flat: 'Flat', elongated: 'Elongated' };
+        const PKG_NAME = { standard: 'Standard', small: 'Small', flat: 'Flat', elongated: 'Elongated' };
+        const CLASSIFY_RULE = 'Small: thể tích < 13.000 cm³, cạnh dài ≤ 350 mm, GW ≤ 4,5 kg · Flat: cạnh ngắn ≤ 200 mm, cạnh ngắn kế ≥ 4× cạnh ngắn, thể tích ≥ 13.000 cm³ · Elongated: cạnh dài ≥ 900 mm, hai cạnh còn lại ≤ 20% cạnh dài (vừa Flat vừa Elongated → Elongated)';
 
-        function sequence17(base, high, opts) {
-            const drops = [];
-            SEQ_3A_PRE.forEach((el, i) => {
-                const n = i + 1;
-                const h = opts.highDrops.includes(n) ? high : base;
-                drops.push({ el, h, block: 'pre', high: h === high && high !== base, note: n === 8 || n === 9 ? 'Thả phẳng mặt đáy.' : (el.length === 3 ? 'Trọng tâm thẳng đứng trên góc.' : 'Trọng tâm thẳng đứng trên cạnh.') });
-            });
-            SEQ_3A_POST.forEach((el, i) => {
-                const n = i + 10;
-                const h = opts.highDrops.includes(n) ? high : base;
-                drops.push({ el, h, block: 'post', high: h === high && high !== base, note: el.length === 3 ? 'Trọng tâm thẳng đứng trên góc.' : 'Trọng tâm thẳng đứng trên cạnh.' });
-            });
-            drops.push({ el: opts.critical, h: opts.highDrops.includes(16) ? high : base, block: 'post', high: opts.highDrops.includes(16), note: 'Hướng dễ hư hỏng nhất (chọn ở form bên trái).' });
-            const hzFace = opts.pkg === 'standard' ? [3] : [2];
-            drops.push({ el: hzFace, h: base, block: 'post', hazard: true, note: `Thả phẳng mặt ${hzFace[0]} lên khối hazard đặt dưới tâm mặt (${opts.pkg === 'standard' ? 'kiện Standard' : 'kiện Flat / Elongated'}). Độ cao đo tới đỉnh khối hazard.` });
-            return drops;
+        // Khối hazard ISTA 3A: cao 25 mm, rộng 150 mm, dài ≥ cạnh ngắn thứ hai của kiện + 200 mm
+        function hazardLength(d) { return [d.L, d.W, d.H].sort((a, b) => a - b)[1] + 200; }
+
+        // Tải đè khi rung (ISTA 3A): TL = (2,7 − kích thước đứng) × 2 kích thước còn lại × 100 kg/m³.
+        // < 11 kg: không đè; 11 – 140 kg: làm tròn lên bội số 2 kg (ISTA 3A-2018); > 140 kg: dùng 140 kg. Dung sai ±3%.
+        function topLoads(d) {
+            const m = { L: d.L / 1000, W: d.W / 1000, H: d.H / 1000 };
+            const tl = (v, a, b) => { const x = (2.7 - v) * a * b * 100; return x < 11 ? 0 : x > 140 ? 140 : Math.ceil(x / 2) * 2; };
+            return { f3: tl(m.H, m.L, m.W), f4: tl(m.W, m.L, m.H), f6: tl(m.L, m.W, m.H) };
         }
+        const tlText = (v) => v ? `tải đè ${v} kg ±3%` : 'không tải đè (TL < 11 kg)';
+
+        // Thả xoay cạnh (ISTA 3A / ASTM D6179): kê cạnh đối diện lên khối đỡ 90–100 mm, nâng cạnh thử lên h rồi thả.
+        // Thứ tự: một cạnh dài nhất của mặt 3 → cạnh dài kế vuông góc 90° → cạnh đối diện cạnh lần 2.
+        const ROT_SUPPORT = 95; // mm
+        function rotationalEdges(d, h, extra = {}) {
+            const order = d.L >= d.W ? [2, 5, 6] : [5, 2, 4];
+            const opp = { 2: 4, 4: 2, 5: 6, 6: 5 };
+            const lenOf = (f) => FACES[f].axis === 0 ? d.L : d.W;
+            const label = ['Một trong các cạnh dài nhất của mặt 3', 'Cạnh dài kế tiếp, vuông góc 90° với cạnh vừa thử', 'Cạnh đối diện cạnh ở lần trước'];
+            return order.map((f, i) => ({
+                el: [3, f].sort((x, y) => x - y), h, rot: f, ...extra,
+                note: `${label[i]} (dài ${lenOf(f)} mm). Kê cạnh 3-${opp[f]} lên khối đỡ ${ROT_SUPPORT} mm, nâng cạnh 3-${f} cách mặt sàn ${h} mm rồi thả.`
+            }));
+        }
+
+        // Lật đổ toàn phần (Full rotational flat drop): dựng thùng trên mặt bên nhỏ nhất, rồi mặt bên lớn kế tiếp,
+        // đẩy nhẹ nửa trên mặt 1 để thùng đổ, mặt 3 đập xuống sàn.
+        function fullRotational(d) {
+            const sides = [
+                { f: 5, area: d.W * d.H, standH: d.L },
+                { f: 2, area: d.L * d.H, standH: d.W }
+            ].sort((a, b) => a.area - b.area);
+            return sides.map((s, i) => ({
+                el: [3], tip: s.f, h: s.standH,
+                note: `Dựng thùng đứng trên mặt ${s.f} (${i === 0 ? 'mặt bên nhỏ nhất' : 'mặt bên lớn kế tiếp'}), tác dụng lực vừa đủ vào nửa trên mặt 1 để thùng đổ tại chỗ, mặt 3 đập xuống sàn.`
+            }));
+        }
+
+        function edgeCornerNote(el) { return el.length === 3 ? 'Trọng tâm thẳng đứng trên góc.' : 'Trọng tâm thẳng đứng trên cạnh.'; }
 
         function computePlan(inp) {
             const { std, kg, d } = inp;
@@ -503,7 +593,7 @@
                         test('Nén (Compression)', 'Apply-and-release (lực tính toán × 1,4), apply-and-hold, hoặc tải trọng + tấm phân tải.');
                         test('Rung lần 1 (Vibration)', 'Fixed displacement 25 mm đỉnh–đỉnh hoặc rung ngẫu nhiên 1,15 Grms.');
                     }
-                    dropBlock(`Va đập – Thả rơi tự do ${h} mm (${(h / 25.4).toFixed(0)} in)`, sequence10(d, h));
+                    dropBlock(`Va đập – Thả rơi tự do ${h} mm (${(h / 25.4).toFixed(0)} in)`, sequence10(d, h, inp.corner));
                     if (!is1A) test('Rung lần 2 (Vibration)', 'Fixed displacement hoặc rung ngẫu nhiên 1,15 Grms (có thể khác phương pháp lần 1).');
                     plan.infos.push('Có thể thay thả rơi bằng Incline Impact hoặc Horizontal Impact (vận tốc theo trọng lượng).');
                     break;
@@ -515,83 +605,178 @@
                     plan.title = is1B ? 'ISTA 1B (2014)' : 'ISTA 2B (2011)';
                     if (!over150) plan.warnings.push(`GW ${kg} kg ≤ 68 kg: ${is1B ? '1B' : '2B'} dành cho kiện > 68 kg (150 lb). Nên dùng ${is1B ? 'ISTA 1A' : 'ISTA 2A'}.`);
                     plan.level = '> 150 lb (> 68 kg)';
-                    plan.method = 'Thả phẳng 150 mm + Thả xoay cạnh 200 mm';
-                    test('Tiền điều hoà (Atmospheric preconditioning)', 'Nhiệt độ & độ ẩm phòng thí nghiệm (ambient).');
+                    const extra = is1B ? {} : { unverified: true };
+                    plan.infos.push('1B/2B xác định mặt theo tư thế vận chuyển dự kiến: nhìn vào mặt có mối dán nhà sản xuất ở bên phải (hoặc mặt hẹp nhất nếu không có mối dán).');
+                    if (!is1B) plan.infos.push('Trình tự va đập 2B đang áp dụng theo procedure 1B-2014 (cùng mức 150 mm / 1,7 m/s / xoay cạnh 200 mm) – CẦN XÁC NHẬN với procedure 2B đầy đủ.');
+                    test('Tiền điều hoà (Atmospheric preconditioning)', 'Nhiệt độ & độ ẩm phòng thí nghiệm trong 12 giờ.');
                     if (is1B) {
-                        test('Rung (Vibration)', 'Fixed displacement 25 mm (1 in) đỉnh–đỉnh, 14.200 lần va chạm rung.');
+                        test('Rung cố định biên độ (Fixed displacement)',
+                            'Mặt 3 xuống, biên độ 25 mm (1 in) đỉnh–đỉnh; tăng dần tần số đến khi luồn được tấm thép 1,5 mm dưới đáy kiện. Thời gian = 11.800 va chạm ÷ CPM (vd. 3 Hz = 180 CPM → 66 phút; 4 Hz → 50 phút). Bàn rung quay: dừng ở nửa thời gian, xoay kiện 90° (hoặc 180° nếu không thể) rồi chạy tiếp.');
                     } else {
                         test('Điều hoà khí hậu (Atmospheric conditioning)', 'Nhiệt độ & độ ẩm chọn theo bảng của procedure.');
                         test('Nén (Compression)', 'Apply-and-release (lực tính toán × 1,4), apply-and-hold, hoặc tải trọng + tấm phân tải.');
                         test('Rung lần 1 (Vibration)', 'Fixed displacement 25 mm đỉnh–đỉnh hoặc rung ngẫu nhiên 1,15 Grms.');
                     }
-                    dropBlock('Va đập – Thả rơi 150 mm (6 in)', [
-                        { el: [3], h: 150, note: 'Thả phẳng mặt đáy. Có thể thay bằng Incline / Horizontal Impact 1,7 m/s.' }
-                    ]);
-                    dropBlock('Va đập – Thả xoay cạnh (Rotational edge drop, ASTM D6179) 200 mm (8 in)', [
-                        { el: [3, 5], h: 200, rot: 5, unverified: true, note: 'Tựa cạnh đáy đầu 6 trên sàn, nâng đầu 5 để cạnh 3-5 cao 200 mm rồi thả cho thùng xoay quanh cạnh tựa.' },
-                        { el: [3, 6], h: 200, rot: 6, unverified: true, note: 'Tựa cạnh đáy đầu 5 trên sàn, nâng đầu 6 để cạnh 3-6 cao 200 mm rồi thả.' }
-                    ]);
-                    plan.infos.push('Thả xoay cạnh bắt buộc khi không thử mặt 1 (kiện luôn vận chuyển đúng chiều).');
+                    if (!inp.noFace1) {
+                        plan.method = 'Thả phẳng 6 mặt 150 mm';
+                        dropBlock('Va đập – Thả rơi 150 mm (6 in), 6 mặt', faceSequence(d, 150, extra));
+                        plan.infos.push('Có thể thay thả rơi bằng va đập dốc nghiêng hoặc va đập ngang, vận tốc tối thiểu 1,7 m/s (lần nào dưới mức tối thiểu phải làm lại). Nếu kiện có skid / pallet hoặc lật úp mặt 1 không an toàn → tick “Không thử mặt 1”.');
+                    } else {
+                        plan.method = 'Va đập 1,7 m/s + thả xoay cạnh 200 mm';
+                        const vert = d.W * d.H <= d.L * d.H ? [[5, 6], [2, 4]] : [[2, 4], [5, 6]];
+                        test('Va đập dốc nghiêng / ngang ≥ 1,7 m/s – 4 mặt đứng (không mô phỏng 3D)',
+                            `Mặt ${vert[0][0]} → mặt ${vert[0][1]} (mặt đứng nhỏ nhất) → mặt ${vert[1][0]} → mặt ${vert[1][1]} (mặt đứng lớn nhất).`);
+                        // Thả xoay: một cạnh mặt 3 bất kỳ, rồi một cạnh đáy vuông góc 90°.
+                        // Kiện dài (L ≥ 2W) có trọng tâm cao dễ lật khi thử cạnh dài → được thử cả 2 cạnh ngắn.
+                        const longThin = d.L >= 2 * d.W;
+                        const pair = longThin ? [5, 6] : [2, 5];
+                        const opp = { 2: 4, 4: 2, 5: 6, 6: 5 };
+                        dropBlock('Va đập – Thả xoay cạnh 200 mm (Rotational edge drop, khối đỡ 90 – 100 mm)', pair.map((f, i) => ({
+                            el: [3, f].sort((x, y) => x - y), h: 200, rot: f, ...extra,
+                            note: `${i === 0 ? 'Cạnh mặt 3 thứ nhất' : longThin ? 'Cạnh ngắn còn lại' : 'Cạnh đáy vuông góc 90° với cạnh vừa thử'}: kê cạnh 3-${opp[f]} lên khối đỡ 90 – 100 mm, nâng cạnh 3-${f} cách sàn 200 mm rồi thả.`
+                        })));
+                        if (longThin) plan.infos.push('L ≥ 2W: nếu trọng tâm cao hơn nửa chiều cao, kiện có thể lật khi thử cạnh dài → thả xoay trên cả 2 cạnh ngắn (3-5 và 3-6).');
+                    }
                     if (!is1B) test('Rung lần 2 (Vibration)', 'Fixed displacement hoặc rung ngẫu nhiên 1,15 Grms.');
                     break;
                 }
 
                 case 'ISTA_2C': {
                     plan.title = 'ISTA 2C (2011) – Furniture';
-                    if (over150) plan.warnings.push(`GW ${kg} kg vượt phạm vi 150 lb (68 kg) của bảng thả rơi 2C.`);
-                    const lvl = inp.level2C;
-                    const row = H_2C.find(r => Math.min(lb, 150) < r.maxLb) || H_2C[2];
-                    const h = row.h[lvl];
-                    plan.level = `Level ${['I', 'II', 'III'][lvl]} · ${row.label}`;
-                    plan.method = 'Thả rơi tự do – 10 lần';
-                    test('Tiền điều hoà (Atmospheric preconditioning)', 'Nhiệt độ & độ ẩm phòng thí nghiệm (ambient).');
-                    test('Điều hoà khí hậu (tuỳ chọn)', 'Nhiệt độ & độ ẩm chọn theo bảng của procedure.');
-                    test('Rung ngẫu nhiên có tải động (Random vibration under dynamic load)', 'Tải đè tính toán theo kênh phân phối, kích thước & cấu hình kiện.');
-                    dropBlock(`Va đập – Thả rơi tự do ${h} mm (${(h / 25.4).toFixed(0)} in)`, sequence10(d, h));
-                    const exc1 = lb >= 100 || d.H > 1500 || (d.L + d.W + d.H) > 2700;
-                    if (exc1) plan.infos.push('Kiện thoả điều kiện Exception One (≥ 45 kg, hoặc cao > 1,5 m, hoặc L+W+H > 2,7 m): nếu không thể thả rơi, được thay bằng va đập dốc nghiêng (Incline Impact).');
-                    plan.infos.push('Độ cao 2C lấy theo bảng Drop Chart (Level I/II/III) – nên đối chiếu lại với procedure 2C đầy đủ.');
+                    const lvl = inp.level2C, row = row2C(lb), sum = d.L + d.W + d.H;
+                    const exc1Ok = lb >= 100 || d.H > 1500 || sum > 2700;
+                    const exc2Ok = lb >= 150 || d.H > 1500 || sum > 3300;
+                    const mode = inp.shock2C;
+                    plan.level = `Level ${LEVEL_2C[lvl]} · ${row.label}`;
+                    plan.infos.push(`Level ${LEVEL_2C[lvl]}: ${LEVEL_2C_NAME[lvl]}. 2C xác định mặt theo tư thế vận chuyển dự kiến (mặt 3 là đáy khi vận chuyển); nhìn vào mặt có mối dán nhà sản xuất ở bên phải, hoặc mặt hẹp nhất nếu không có mối dán.`);
+
+                    test('Tiền điều hoà (Atmospheric preconditioning)', 'Nhiệt độ & độ ẩm phòng thí nghiệm trong 12 giờ.');
+                    test('Điều hoà khí hậu (tuỳ chọn)', 'Chọn theo bảng điều kiện dự kiến (vd. 38 °C / 85% RH trong 72 giờ). Thử lại toàn bộ cho mỗi điều kiện được chọn.');
+
+                    // Rung ngẫu nhiên có tải động
+                    const oneAxis = inp.orient2C || d.H >= 1500 || mode === 'exc2';
+                    const t3 = topLoad2C(d, kg, lvl, d.H, d.L, d.W, 3);
+                    const t4 = topLoad2C(d, kg, lvl, d.W, d.L, d.H, 4);
+                    const t6 = topLoad2C(d, kg, lvl, d.L, d.W, d.H, 6);
+                    const tlS = (t) => `tải đè ${t.tl} kg${t.capped ? ' (đã giới hạn tối đa)' : ''}`;
+                    const noLoad = d.H >= 1800 && inp.orient2C;
+                    const nApp = (d.L > 500 && d.W > 500) ? 4 : (d.L > 500 || d.W > 500) ? 2 : 1;
+                    const vibDetail = noLoad
+                        ? 'Kiện cao ≥ 1,8 m có skid / pallet: rung không tải đè, mặt 3 xuống 60 phút.'
+                        : oneAxis
+                            ? `Chỉ 1 trục (cao ≥ 1,5 m, có ký hiệu định hướng hoặc skid / pallet): mặt 3 xuống 60 phút – ${tlS(t3)}.`
+                            : `Mặt 3 xuống 20 phút – ${tlS(t3)} · Mặt 2 hoặc 4 xuống 20 phút – ${tlS(t4)} · Mặt 5 hoặc 6 xuống 20 phút – ${tlS(t6)}.`;
+                    test(`Rung ngẫu nhiên có tải động – phổ Level ${LEVEL_2C[lvl]}, ${GRMS_2C[lvl]}`,
+                        vibDetail + (noLoad ? '' : ` Tải đè mô phỏng hàng xếp chồng ${TL_DENSITY_2C[lvl]} kg/m³; dùng ${nApp} bộ tải đè bằng nhau (mặt trên > 500 mm theo 1 chiều → 2 bộ, cả 2 chiều → 4 bộ), không chìa quá 40 mm.`));
+
+                    if (mode === 'exc1') {
+                        if (!exc1Ok) plan.warnings.push('Kiện KHÔNG thoả Exception One (cần ≥ 45 kg, hoặc cao > 1,5 m, hoặc L+W+H > 2,7 m, và việc thả rơi là không khả thi) → phải dùng thả rơi.');
+                        plan.method = `Va đập dốc / ngang ${row.v[lvl]} m/s – 10 lần`;
+                        const seq = sequence10(d, 0, inp.corner).map((x, i) => `${i + 1}. ${elName(x.el)}`).join(' · ');
+                        test(`Va đập – Exception One: dốc nghiêng (Conbur) hoặc ngang, vận tốc ${row.v[lvl]} m/s (không mô phỏng 3D)`,
+                            `Đặt kiện giữa xe trượt, mặt đứng áp sát tấm chặn. Trình tự 10 lần: ${seq}.`);
+                    } else if (mode === 'exc2') {
+                        if (!exc2Ok) plan.warnings.push('Kiện KHÔNG thoả Exception Two (cần có đế skid và ký hiệu đáy rõ ràng, và ≥ 68 kg, hoặc cao > 1,5 m, hoặc L+W+H > 3,3 m).');
+                        const r = ROT_2C[lvl];
+                        plan.method = `Va đập 1,1 m/s + thả xoay cạnh ${r.h} mm`;
+                        const vert = d.W * d.H <= d.L * d.H ? [[5, 6], [2, 4]] : [[2, 4], [5, 6]];
+                        test('Va đập – Exception Two: dốc nghiêng hoặc ngang, vận tốc 1,1 m/s (không mô phỏng 3D)',
+                            `4 lần trên các mặt đứng: mặt ${vert[0][0]} → mặt ${vert[0][1]} (nhỏ nhất) → mặt ${vert[1][0]} → mặt ${vert[1][1]} (lớn nhất).`);
+                        const opp = { 2: 4, 4: 2, 5: 6, 6: 5 };
+                        dropBlock(`Va đập – Exception Two: thả xoay cạnh ${r.h} mm, khối đỡ ${r.sText}`, [2, 4, 5, 6].map(f => ({
+                            el: [3, f].sort((x, y) => x - y), h: r.h, rot: f, support: r.s,
+                            note: `Kê cạnh 3-${opp[f]} lên khối đỡ ${r.sText}, nâng cạnh 3-${f} cách sàn ${r.h} mm rồi thả rơi tự do.`
+                        })));
+                    } else {
+                        if (over150) plan.warnings.push(`GW ${kg} kg > 68 kg: xem xét Exception One / Two hoặc ISTA 2B.`);
+                        if (exc1Ok) plan.infos.push(`Kiện thoả điều kiện kích thước / trọng lượng của Exception One (≥ 45 kg, cao > 1,5 m, hoặc L+W+H > 2,7 m): nếu không thể thả rơi, được thay bằng va đập dốc / ngang ${row.v[lvl]} m/s.`);
+                        const h = row.h[lvl];
+                        plan.method = 'Thả rơi tự do – 10 lần';
+                        dropBlock(`Va đập – Thả rơi tự do ${h} mm (${(h / 25.4).toFixed(0)} in)`, sequence10(d, h, inp.corner));
+                    }
                     break;
                 }
 
                 case 'ISTA_3A':
                 case 'AMZ_A':
                 case 'AMZ_B': {
-                    const pkg = inp.pkgType === 'auto' ? classify3A(d) : inp.pkgType;
-                    let base, high, highDrops;
-                    if (std === 'ISTA_3A') {
+                    const is3A = std === 'ISTA_3A';
+                    let pkg = inp.pkgType === 'auto' ? classify3A(d, kg) : inp.pkgType;
+                    if (!is3A && pkg === 'small') pkg = 'standard';
+                    let base, high;
+                    if (is3A) {
                         plan.title = 'ISTA 3A (2018)';
-                        if (over150) plan.warnings.push(`GW ${kg} kg vượt phạm vi 150 lb (68 kg) của ISTA 3A.`);
-                        const light = lb < 70;
-                        base = light ? 460 : 300; high = light ? 910 : 600; highDrops = [16];
-                        plan.level = `${PKG_NAME[pkg]} · ${light ? '< 70 lb (< 32 kg)' : '70 – 150 lb (32 – 68 kg)'}`;
+                        plan.infos.push('ISTA 3A-2018 khuyến nghị thử ≥ 2 mẫu cho sản phẩm dễ vỡ / chứa chất lỏng, và ≥ 5 mẫu để có ý nghĩa thống kê.');
+                        if (kg > 70) plan.warnings.push(`GW ${kg} kg vượt phạm vi 70 kg (150 lb) của ISTA 3A.`);
+                        const light = kg < 32;
+                        base = light ? 460 : 300; high = light ? 910 : 600;
+                        plan.level = `${PKG_NAME[pkg]} · ${light ? '< 32 kg (70 lb)' : '32 – 70 kg (70 – 150 lb)'}`;
                     } else if (std === 'AMZ_A') {
                         plan.title = 'ISTA 6-Amazon.com SIOC Type A';
                         if (lb >= 50) plan.warnings.push(`GW ${kg} kg ≥ 23 kg (50 lb): thuộc Type B.`);
-                        base = 460; high = 910; highDrops = [8, 16];
+                        base = 460; high = 910;
                         plan.level = `Type A · ${PKG_NAME[pkg]} · < 50 lb`;
                     } else {
                         plan.title = 'ISTA 6-Amazon.com SIOC Type B';
                         if (lb < 50 || lb >= 100) plan.warnings.push(`Type B áp dụng cho 50 – 100 lb (23 – 45 kg); GW hiện tại ${kg} kg.`);
-                        base = 300; high = 600; highDrops = [8, 16];
+                        base = 300; high = 600;
                         plan.level = `Type B · ${PKG_NAME[pkg]} · 50 – 100 lb`;
-                        plan.warnings.push('Độ cao Type B (300 / 600 mm) đang suy ra từ nhóm nặng của ISTA 3A – CẦN XÁC NHẬN với protocol 6-Amazon.com-SIOC.');
+                        plan.warnings.push('Độ cao Type B (300 / 600 mm) đang suy ra từ nhóm 32 – 70 kg của ISTA 3A – CẦN XÁC NHẬN với protocol 6-Amazon.com-SIOC.');
                     }
-                    if (inp.pkgType === 'auto') plan.infos.push(`Tự nhận diện loại kiện: ${PKG_NAME[pkg]} (Flat: cạnh ngắn ≤ 200 mm, cạnh kế ≥ 4× cạnh ngắn, thể tích ≥ 13.000 cm³; Elongated: cạnh dài ≥ 914 mm, hai cạnh còn lại ≤ 20% cạnh dài).`);
-                    plan.method = 'Thả rơi tự do 17 lần + Hazard';
-                    const drops = sequence17(base, high, { highDrops, critical: inp.critical, pkg });
-                    test('Tiền điều hoà (Atmospheric preconditioning)', 'Nhiệt độ & độ ẩm phòng thí nghiệm, tối thiểu 12 giờ.');
-                    if (std === 'ISTA_3A') test('Điều hoà khí hậu (Atmospheric conditioning)', 'Nhiệt độ & độ ẩm chọn theo bảng của procedure (tuỳ chọn).');
-                    dropBlock(`Va đập – Thả rơi lần 1 – 9 (trước rung)`, drops.slice(0, 9));
-                    if (std === 'ISTA_3A') {
-                        test('Rung ngẫu nhiên có tải đè (Random vibration with top load)', 'Tuỳ chọn thêm: rung dưới áp suất thấp (vận chuyển hàng không).');
+                    if (inp.pkgType === 'auto') plan.infos.push(`Tự nhận diện loại kiện: <b>${PKG_NAME[pkg]}</b> (${CLASSIFY_RULE}).`);
+                    // ISTA 3A-2018: đặt thùng ở tư thế ổn định nhất (trọng tâm thấp nhất; không rõ thì mặt lớn nhất xuống),
+                    // một trong các mặt nhỏ nhất (đầu nặng hơn nếu có) quay về phía người thử làm mặt 5
+                    if (d.H > Math.min(d.L, d.W)) plan.infos.push('Theo 3A-2018, mặt 3 là mặt đáy ở tư thế ổn định nhất (trọng tâm thấp nhất; nếu không rõ thì mặt lớn nhất úp xuống) – có thể khác hướng vận chuyển thực tế. Kiểm tra lại: H thường là kích thước nhỏ nhất.');
+                    if (d.W > d.L) plan.infos.push('Theo 3A-2018, một trong các mặt nhỏ nhất (đầu nặng hơn, nếu có) quay về phía người thử làm mặt 5 → nên nhập L ≥ W.');
+
+                    // Lần 1 – 9 (mọi loại kiện): lần 8 thả mặt 3 từ độ cao lớn
+                    const pre = SEQ_3A_PRE.map((el, i) => {
+                        const n = i + 1;
+                        if (n === 8) return { el, h: high, high: true, note: 'Thả phẳng mặt 3 từ độ cao lớn.' };
+                        if (n === 9) return { el, h: base, note: 'Thả phẳng mặt 3.' };
+                        return { el, h: base, note: edgeCornerNote(el) };
+                    });
+                    test('Tiền điều hoà (Atmospheric preconditioning)', 'Nhiệt độ & độ ẩm phòng thí nghiệm trong 12 giờ.');
+                    if (is3A) test('Điều hoà khí hậu (tuỳ chọn)', 'Chọn theo bảng điều kiện dự kiến (vd. nhiệt đới ẩm 38 °C / 85% RH trong 72 giờ).');
+                    dropBlock('Va đập – Thả rơi lần 1 – 9 (trước rung)', pre);
+
+                    if (pkg === 'small') {
+                        plan.method = 'Thả rơi 9 lần + 7 lần trong bao';
+                        test('Rung ngẫu nhiên trong bao (Small)', 'Kiện đặt giữa túi gom hàng (consolidation bag ~1,0 × 0,7 m) cùng các gói độn, túi cát 36 kg ±5% đè lên; phổ Over-the-Road 0,53 Grms: mặt 1 xuống 30 phút, lật mặt 2 xuống 30 phút.');
+                        test('Rung ngẫu nhiên Pick-up & Delivery', '0,46 Grms, mặt 3 xuống, không tải đè, 30 phút.');
+                        test('Tuỳ chọn – Rung dưới áp suất thấp (không để trong túi)', 'Ổn định 23 °C / 50% RH trong 8 giờ; mặt 6 xuống, 60 phút ở 70 kPa với phổ Over-the-Road (chỉ xe tải); vận chuyển hàng không làm thêm 60 phút ở 60 kPa với phổ 1,05 Grms.');
+                        test('Va đập – Thả trong túi, lần 10 – 16 (7 lần, 610 mm, không mô phỏng 3D)', 'Thả cả túi gom hàng từ 610 mm (24 in), hướng theo đánh số mặt của túi: 10 Mặt 4 · 11 Mặt 1 · 12 Mặt 2 · 13 Mặt 3 · 14 Mặt 1 · 15 Mặt 2 · 16 Mặt 4.');
+                        test('Leak test – 8 giờ', 'Chỉ bắt buộc với sản phẩm chứa chất lỏng.');
+                        break;
+                    }
+
+                    const tl = topLoads(d);
+                    test('Rung ngẫu nhiên có tải đè (Over-the-Road 0,53 Grms)',
+                        `Mặt 3 xuống 60 phút – ${tlText(tl.f3)} · Mặt 4 xuống 30 phút – ${tlText(tl.f4)} · Mặt 6 xuống 30 phút – ${tlText(tl.f6)}.`);
+                    test('Rung ngẫu nhiên Pick-up & Delivery (0,46 Grms)', 'Mặt 3 xuống, không tải đè, 30 phút.');
+                    if (is3A) test('Tuỳ chọn – Rung dưới áp suất thấp', 'Ổn định 23 °C / 50% RH trong 8 giờ; mặt 6 xuống, không tải đè, 60 phút ở 70 kPa với phổ Over-the-Road (chỉ xe tải); vận chuyển hàng không làm thêm 60 phút ở 60 kPa với phổ 1,05 Grms.');
+
+                    const post = SEQ_3A_POST.map(el => ({ el, h: base, note: edgeCornerNote(el) }));
+                    post.push({ el: inp.critical, h: high, high: true, note: `Hướng phẳng dễ hư hỏng nhất (đang chọn ${elName(inp.critical)} – đổi ở form bên trái).` });
+                    const hzFace = pkg === 'standard' ? 3 : 2;
+                    post.push({
+                        el: [hzFace], h: base, hazard: true,
+                        note: `Thả phẳng mặt ${hzFace} lên khối hazard (cao 25 mm, rộng 150 mm, dài ${hazardLength(d)} mm, cạnh trên bo tròn) đặt ở giữa chiều dài mặt, song song với cạnh ngắn của mặt. Độ cao đo tới sàn, không phải tới khối hazard.`
+                            + (pkg === 'standard' ? '' : ' (Kiện Flat / Elongated thả mặt 2 lên hazard theo ISTA 3A-2018.)')
+                    });
+                    dropBlock('Va đập – Thả rơi lần 10 – 17 (sau rung, có Hazard)', post);
+
+                    if (pkg === 'standard') {
+                        plan.method = 'Thả rơi 17 lần (có Hazard)';
                     } else {
-                        test('Rung có tải đè – mặt 3, 4, 6', 'Rung ngẫu nhiên lần lượt trên mặt 3, 4, 6 có tải đè; sau đó rung xe bán tải (pick-up truck) trên mặt 3, không tải.');
+                        plan.method = 'Thả rơi 17 lần + xoay cạnh + lật đổ';
+                        dropBlock('Va đập – Thả xoay cạnh 200 mm (Rotational edge drop, 3 cạnh mặt 3)', rotationalEdges(d, 200));
+                        dropBlock('Va đập – Lật đổ toàn phần (Full rotational flat drop)', fullRotational(d));
+                        if (pkg === 'flat') test('Va đập tập trung (Concentrated impact)', 'Thùng nằm mặt 3; thả hộp hazard 4,1 kg (300×300×300 mm, cạnh đáy bọc thép góc) từ 400 mm, cạnh thép song song cạnh ngắn mặt 1, rơi vào tâm mặt 1.');
+                        else test('Va đập bắc cầu (Bridge impact)', 'Mặt 3 kê trên 2 khối đỡ 90–100 mm ở hai đầu chiều dài; thả hộp hazard 4,1 kg từ 400 mm vào giữa chiều dài mặt 1, cạnh thép song song cạnh ngắn mặt 1.');
+                        plan.infos.push('Kiện Flat / Elongated: sau 17 lần thả còn bắt buộc thả xoay cạnh 200 mm, lật đổ toàn phần và ' + (pkg === 'flat' ? 'va đập tập trung' : 'va đập bắc cầu') + ' (ISTA 3A-2018, block 10 – 13).');
                     }
-                    dropBlock(`Va đập – Thả rơi lần 10 – 17 (sau rung, có Hazard)`, drops.slice(9));
-                    if (std !== 'ISTA_3A') {
-                        test('Các block bổ sung theo loại kiện', 'Rotational edge drop, Full rotational flat drop, Bridge impact, Concentrated edge impact, Leak test – chỉ áp dụng khi loại kiện / sản phẩm yêu cầu.');
-                    }
+                    test(is3A ? 'Leak test – 8 giờ' : 'Leak test (nếu áp dụng)', 'Chỉ bắt buộc với sản phẩm chứa chất lỏng.');
                     break;
                 }
             }
@@ -609,7 +794,7 @@
         // =====================================================================
         // 4. ENGINE 3D (Three.js) + VẬT LÝ (cannon-es)
         // =====================================================================
-        const HAZARD = { x: 0.30, y: 0.05, z: 0.10 }; // khối hazard minh hoạ (m)
+        const HAZARD_H = 0.025, HAZARD_W = 0.15;   // khối hazard ISTA 3A (m)
 
         const sim = {
             state: 'idle', speed: 0.25, simTime: 0, impactV: null, impactAt: 0,
@@ -658,25 +843,19 @@
                 grid.position.y = -0.029;
                 this.scene.add(grid);
 
-                this.hazardMesh = new THREE.Mesh(new THREE.BoxGeometry(HAZARD.x, HAZARD.y, HAZARD.z), new THREE.MeshStandardMaterial({ color: 0xb7793f, roughness: 0.8 }));
-                this.hazardMesh.position.y = HAZARD.y / 2;
-                this.hazardMesh.castShadow = this.hazardMesh.receiveShadow = true;
-                this.hazardMesh.visible = false;
-                this.scene.add(this.hazardMesh);
+                this.fixtures = [];
 
                 // Thế giới vật lý
                 this.world = new CANNON.World({ gravity: new CANNON.Vec3(0, -G, 0) });
                 this.world.allowSleep = true;
                 this.world.broadphase = new CANNON.NaiveBroadphase();
                 this.world.solver.iterations = 20;
-                const groundMat = new CANNON.Material('ground');
+                this.groundMat = new CANNON.Material('ground');
                 this.boxMat = new CANNON.Material('box');
-                this.world.addContactMaterial(new CANNON.ContactMaterial(groundMat, this.boxMat, { friction: 0.6, restitution: 0.12 }));
-                const ground = new CANNON.Body({ mass: 0, material: groundMat, shape: new CANNON.Plane() });
+                this.world.addContactMaterial(new CANNON.ContactMaterial(this.groundMat, this.boxMat, { friction: 0.6, restitution: 0.12 }));
+                const ground = new CANNON.Body({ mass: 0, material: this.groundMat, shape: new CANNON.Plane() });
                 ground.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
                 this.world.addBody(ground);
-                this.hazardBody = new CANNON.Body({ mass: 0, material: groundMat, shape: new CANNON.Box(new CANNON.Vec3(HAZARD.x / 2, HAZARD.y / 2, HAZARD.z / 2)) });
-                this.hazardBody.position.set(0, HAZARD.y / 2, 0);
 
                 new ResizeObserver(() => this.resize()).observe(container);
                 this.clock = new THREE.Clock();
@@ -724,6 +903,13 @@
                     // Bỏ qua tiếp xúc tĩnh (vd. cạnh tựa khi thả xoay cạnh)
                     const v = Math.abs(e.contact.getImpactVelocityAlongNormal());
                     if (v < 0.1) return;
+                    // Thả xoay / lật đổ: chỉ tính va chạm khi cạnh-mặt thử đã chạm sàn (bỏ qua tiếp xúc ở cạnh tựa)
+                    if (this.drop.rot || this.drop.tip) {
+                        const b = this.body;
+                        const p = elVector(this.drop.el, this.d)
+                            .applyQuaternion(new THREE.Quaternion(b.quaternion.x, b.quaternion.y, b.quaternion.z, b.quaternion.w));
+                        if (p.y + b.position.y > 0.03) return;
+                    }
                     this.impactV = v;
                     this.impactAt = this.simTime;
                     hud.impact(this.impactV);
@@ -741,33 +927,55 @@
                 this.impactV = null;
                 this.simTime = 0;
                 const d = this.d, hM = drop.h / 1000;
-                this.surfaceY = drop.hazard ? HAZARD.y : 0;
-
-                // Hazard
-                this.hazardMesh.visible = !!drop.hazard;
-                if (drop.hazard && !this.world.bodies.includes(this.hazardBody)) this.world.addBody(this.hazardBody);
-                if (!drop.hazard && this.world.bodies.includes(this.hazardBody)) this.world.removeBody(this.hazardBody);
+                const UP = new THREE.Vector3(0, 1, 0), DOWN = new THREE.Vector3(0, -1, 0);
+                // Độ cao luôn đo tới sàn (kể cả lần thả lên hazard – theo ISTA 3A)
+                this.surfaceY = 0;
+                this.clearFixtures();
 
                 const q = new THREE.Quaternion();
                 const pos = new THREE.Vector3();
                 if (drop.rot) {
-                    // Thả xoay cạnh: tựa cạnh đáy đối diện trên sàn, nâng đầu "rot" lên độ cao h
+                    // Thả xoay cạnh: cạnh đáy đối diện kê trên khối đỡ, nâng cạnh "rot" cách sàn h rồi thả
+                    const S = (drop.support || ROT_SUPPORT) / 1000;
                     const F = FACES[drop.rot];
                     const u = new THREE.Vector3(); u.setComponent(F.axis, F.sign);
                     const half = axisDims(d)[F.axis] / 2;
-                    const theta = Math.asin(Math.min(0.99, hM / (2 * half)));
-                    const axis = new THREE.Vector3().crossVectors(u, new THREE.Vector3(0, 1, 0)).normalize();
+                    const theta = Math.asin(Math.min(0.99, (hM - S) / (2 * half)));
+                    const axis = new THREE.Vector3().crossVectors(u, UP).normalize();
                     q.setFromAxisAngle(axis, theta);
                     const pivotLocal = u.clone().multiplyScalar(-half).add(new THREE.Vector3(0, -d.H / 2, 0));
-                    const pivotWorld = new THREE.Vector3(pivotLocal.x, 0, pivotLocal.z);
+                    const pivotWorld = new THREE.Vector3(pivotLocal.x, S, pivotLocal.z);
                     pos.copy(pivotWorld).sub(pivotLocal.clone().applyQuaternion(q));
+                    // Khối đỡ 95 × 95 mm, dài hơn cạnh tựa 200 mm
+                    const edgeLen = axisDims(d)[[0, 2].find(a => a !== F.axis)] + 0.2;
+                    this.addFixture(edgeLen, S, S, new THREE.Vector3(pivotWorld.x, S / 2, pivotWorld.z), axis, 0x8b6b4a);
+                } else if (drop.tip) {
+                    // Lật đổ toàn phần: dựng trên mặt "tip", đẩy nghiêng vừa quá điểm cân bằng (atan(b/a) + 0,5°) về phía mặt 3
+                    const n = new THREE.Vector3(); n.setComponent(FACES[drop.tip].axis, FACES[drop.tip].sign);
+                    q.setFromUnitVectors(n, DOWN);
+                    const n3 = new THREE.Vector3(0, -1, 0).applyQuaternion(q);
+                    const k = new THREE.Vector3().crossVectors(UP, n3).normalize();
+                    const tilt = Math.atan(d.H / hM) + THREE.MathUtils.degToRad(0.5);
+                    q.premultiply(new THREE.Quaternion().setFromAxisAngle(k, tilt));
+                    pos.set(0, this.lowestOffset(q), 0);
                 } else {
                     // Thả tự do: vector tâm → điểm va chạm hướng thẳng xuống (trọng tâm trên điểm va chạm)
                     q.setFromUnitVectors(elVector(drop.el, d).normalize(), new THREE.Vector3(0, -1, 0));
                     // Lệch 2° (trong dung sai ISTA ≤ 5° cho cạnh/góc) để thùng đổ tự nhiên sau va chạm thay vì đứng thăng bằng
                     if (elType(drop.el) !== 'face') q.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 1).normalize(), THREE.MathUtils.degToRad(2)));
                     const low = this.lowestOffset(q);
-                    pos.set(0, this.surfaceY + hM + low, 0);
+                    pos.set(0, hM + low, 0);
+                    if (drop.hazard) {
+                        // Khối hazard đặt ở giữa mặt va chạm, chiều dài song song cạnh ngắn của mặt
+                        const F = FACES[drop.el[0]];
+                        const others = [0, 1, 2].filter(a => a !== F.axis);
+                        const dims = axisDims(d);
+                        const shortAxis = dims[others[0]] <= dims[others[1]] ? others[0] : others[1];
+                        const dir = new THREE.Vector3(); dir.setComponent(shortAxis, 1);
+                        dir.applyQuaternion(q).setY(0).normalize();
+                        this.addFixture(hazardLength({ L: d.L * 1000, W: d.W * 1000, H: d.H * 1000 }) / 1000, HAZARD_H, HAZARD_W,
+                            new THREE.Vector3(0, HAZARD_H / 2, 0), dir, 0xb7793f);
+                    }
                 }
                 this.box.position.copy(pos);
                 this.box.quaternion.copy(q);
@@ -781,6 +989,31 @@
                 this.buildMarker(drop);
                 this.buildRuler(hM);
                 hud.ready(drop);
+            },
+
+            // Vật cố định (khối hazard, khối đỡ): length chạy theo hướng "along" (nằm ngang)
+            addFixture(length, height, width, pos, along, color) {
+                const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), along.clone().normalize());
+                const mesh = new THREE.Mesh(new THREE.BoxGeometry(length, height, width), new THREE.MeshStandardMaterial({ color, roughness: 0.8 }));
+                mesh.position.copy(pos);
+                mesh.quaternion.copy(q);
+                mesh.castShadow = mesh.receiveShadow = true;
+                this.scene.add(mesh);
+                const body = new CANNON.Body({ mass: 0, material: this.groundMat, shape: new CANNON.Box(new CANNON.Vec3(length / 2, height / 2, width / 2)) });
+                body.position.set(pos.x, pos.y, pos.z);
+                body.quaternion.set(q.x, q.y, q.z, q.w);
+                this.world.addBody(body);
+                this.fixtures.push({ mesh, body });
+            },
+
+            clearFixtures() {
+                this.fixtures.forEach(({ mesh, body }) => {
+                    this.scene.remove(mesh);
+                    mesh.geometry.dispose();
+                    mesh.material.dispose();
+                    this.world.removeBody(body);
+                });
+                this.fixtures = [];
             },
 
             lowestOffset(q) {
@@ -845,7 +1078,7 @@
                 const line = new THREE.Mesh(new THREE.BoxGeometry(lineLen, 0.004, 0.004), new THREE.MeshBasicMaterial({ color: 0xff4d4f }));
                 line.position.set(x + lineLen / 2, y, 0);
                 g.add(line);
-                const lab = textSprite(`h = ${Math.round(hM * 1000)} mm`, { size: 0.06, color: '#ffffff', bg: 'rgba(220,38,38,.9)' });
+                const lab = textSprite(this.drop.tip ? `cao đứng ${Math.round(hM * 1000)} mm` : `h = ${Math.round(hM * 1000)} mm`,{ size: 0.06, color: '#ffffff', bg: 'rgba(220,38,38,.9)' });
                 lab.position.set(x - 0.02, y + 0.06, 0);
                 g.add(lab);
                 this.ruler = g;
@@ -870,9 +1103,9 @@
                 hud.status('Đang rơi...', 'text-danger');
             },
 
-            // Độ cao điểm va chạm so với bề mặt: thả xoay theo cạnh được nâng, thả tự do theo điểm thấp nhất của thùng
+            // Độ cao điểm va chạm so với sàn: thả xoay / lật đổ theo cạnh-mặt va chạm, thả tự do theo điểm thấp nhất của thùng
             impactPointY() {
-                if (this.drop.rot) {
+                if (this.drop.rot || this.drop.tip) {
                     const p = elVector(this.drop.el, this.d).applyQuaternion(this.box.quaternion).add(this.box.position);
                     return p.y - this.surfaceY;
                 }
@@ -957,22 +1190,33 @@
 
         // Vận tốc va chạm & năng lượng lý thuyết.
         // Thả tự do: v = √(2gh), E = m·g·h.
-        // Thả xoay cạnh: bảo toàn năng lượng quay quanh cạnh tựa, I = m(a² + H²)/3, v = ω·a, E = m·g·Δh(trọng tâm).
+        // Thả xoay cạnh / lật đổ: bảo toàn năng lượng quay quanh cạnh tựa, I = m(a² + b²)/3, v = ω·a, E = m·g·Δh(trọng tâm).
         function impactCalc(dr, dmm, kg) {
             const h = dr.h / 1000;
-            if (!dr.rot) return { v: Math.sqrt(2 * G * h), E: kg * G * h };
-            const a = axisDims(dmm)[FACES[dr.rot].axis] / 1000, H = dmm.H / 1000;
-            const s = Math.min(0.99, h / a), c = Math.sqrt(1 - s * s);
-            const dcg = h / 2 + H / 2 * (c - 1);
-            const w = Math.sqrt(2 * G * dcg / ((a * a + H * H) / 3));
-            return { v: w * a, E: kg * G * dcg };
+            const rotate = (a, b, dcg) => ({ v: Math.sqrt(2 * G * dcg / ((a * a + b * b) / 3)) * a, E: kg * G * dcg });
+            if (dr.tip) {
+                // Đứng cao a trên cạnh tựa, đổ xuống nằm trên mặt 3 (dày b = H)
+                const b = dmm.H / 1000;
+                return rotate(h, b, (h - b) / 2);
+            }
+            if (dr.rot) {
+                // Cạnh tựa trên khối đỡ cao S; cạnh thử từ độ cao h rơi xuống sàn
+                const a = axisDims(dmm)[FACES[dr.rot].axis] / 1000, H = dmm.H / 1000, S = (dr.support || ROT_SUPPORT) / 1000;
+                const y = (th) => a / 2 * Math.sin(th) + H / 2 * Math.cos(th);
+                const dcg = y(Math.asin(Math.min(0.99, (h - S) / a))) - y(Math.asin(-S / a));
+                return rotate(a, H, dcg);
+            }
+            // Lần thả lên hazard: độ cao đo tới sàn, thùng chạm khối hazard sớm hơn 25 mm
+            const hEff = dr.hazard ? h - HAZARD_H : h;
+            return { v: Math.sqrt(2 * G * hEff), E: kg * G * hEff };
         }
+        const heightText = (dr) => dr.tip ? `Lật đổ (cao đứng ${dr.h} mm)` : fmtMm(dr.h);
 
         const hud = {
             ready(drop) {
                 $('hudStep').textContent = `${drop.no} / ${app.plan.drops.length}`;
-                $('hudEl').textContent = elName(drop.el) + (drop.hazard ? ' (hazard)' : drop.rot ? ' (xoay)' : '');
-                $('hudTarget').textContent = `${drop.h} mm`;
+                $('hudEl').textContent = elName(drop.el) + (drop.hazard ? ' (hazard)' : drop.rot ? ' (xoay)' : drop.tip ? ' (lật đổ)' : '');
+                $('hudTarget').textContent = drop.tip ? 'lật đổ' : `${drop.h} mm`;
                 $('hudHeight').textContent = `${drop.h} mm`;
                 $('hudVel').textContent = '0.00 m/s';
                 const inp = app.readInput();
@@ -1006,6 +1250,10 @@
                     kg: num('grossWeight', 1),
                     d: { L: Math.round(num('dimL', 100)), W: Math.round(num('dimW', 100)), H: Math.round(num('dimH', 100)) },
                     level2C: parseInt($('level2C').value, 10),
+                    shock2C: $('shock2C').value,
+                    orient2C: $('orient2C').checked,
+                    noFace1: $('noFace1').checked,
+                    corner: $('firstCorner').value.split('-').map(Number),
                     pkgType: $('pkgType').value,
                     critical
                 };
@@ -1014,6 +1262,9 @@
             toggleOptions() {
                 const std = $('testStandard').value;
                 $('grp2cLevel').classList.toggle('d-none', std !== 'ISTA_2C');
+                $('grpShock2C').classList.toggle('d-none', std !== 'ISTA_2C');
+                $('grpNoFace1').classList.toggle('d-none', !['ISTA_1B', 'ISTA_2B'].includes(std));
+                $('grpCorner').classList.toggle('d-none', !['ISTA_1A', 'ISTA_2A', 'ISTA_2C'].includes(std));
                 const seq17 = ['ISTA_3A', 'AMZ_A', 'AMZ_B'].includes(std);
                 $('grpPkgType').classList.toggle('d-none', !seq17);
                 $('grpCritical').classList.toggle('d-none', !seq17);
@@ -1032,8 +1283,8 @@
                 $('resLevel').textContent = p.level;
                 $('resMethod').textContent = p.method;
                 $('resDrops').textContent = `${p.drops.length} lần`;
-                const hs = [...new Set(p.drops.map(d => d.h))].sort((a, b) => a - b);
-                $('resHeight').textContent = hs.map(h => `${h}`).join(' / ') + ' mm';
+                const hs = [...new Set(p.drops.filter(d => !d.tip).map(d => d.h))].sort((a, b) => a - b);
+                $('resHeight').textContent = hs.length ? hs.map(h => `${h}`).join(' / ') + ' mm' : 'không thả rơi';
                 $('hudStandard').textContent = p.title;
                 $('planSummary').innerHTML = `<b>${escapeHtml($('itemName').value || 'Sản phẩm')}</b> · GW ${inp.kg} kg (${(inp.kg * KG_TO_LB).toFixed(1)} lb) · ${inp.d.L} × ${inp.d.W} × ${inp.d.H} mm · <b>${p.title}</b>`;
 
@@ -1042,11 +1293,21 @@
                     + p.infos.map(w => `<div class="alert alert-info py-2 px-3 mb-2 ista-warn"><i class="fa-solid fa-circle-info me-1"></i>${w}</div>`).join('');
 
                 this.renderTable();
-                if (sim.renderer) {
-                    sim.setPackage(inp.d, inp.kg);
+                if (sim.renderer) sim.setPackage(inp.d, inp.kg);
+                if (p.drops.length) {
                     this.select(0, true);
+                } else {
+                    // Không có lần thả rơi (vd. 2C Exception One): chỉ hiển thị thùng nằm trên sàn
+                    $('currentStepDesc').innerHTML = '<i class="fa-solid fa-circle-info me-1"></i>Phương pháp này không có lần thả rơi để mô phỏng – xem chương trình chi tiết bên dưới.';
+                    if (sim.renderer) {
+                        sim.setDrop({ el: [3], h: 0, no: 0, note: '' });
+                        sim.fit();
+                        hud.status('Không thả rơi', 'text-secondary');
+                    }
                 }
             },
+
+            hasDrops() { return !!(this.plan && this.plan.drops.length); },
 
             renderTable() {
                 const rows = [];
@@ -1061,6 +1322,7 @@
                         const t = elType(dr.el);
                         const tags = (dr.hazard ? '<span class="ista-tag hazard">HAZARD</span>' : '')
                             + (dr.rot ? '<span class="ista-tag rot">XOAY CẠNH</span>' : '')
+                            + (dr.tip ? '<span class="ista-tag rot">LẬT ĐỔ</span>' : '')
                             + (dr.high ? '<span class="ista-tag high">ĐỘ CAO LỚN</span>' : '')
                             + (dr.unverified ? '<span class="ista-tag high">CẦN XÁC NHẬN</span>' : '');
                         const ic = impactCalc(dr, d, kg);
@@ -1068,7 +1330,7 @@
                             <td class="fw-bold">${dr.no}</td>
                             <td><span class="ista-el ${t}">${elName(dr.el)}</span>${tags}</td>
                             <td class="small">${dr.note}</td>
-                            <td class="text-end text-nowrap fw-semibold">${fmtMm(dr.h)}</td>
+                            <td class="text-end text-nowrap fw-semibold">${heightText(dr)}</td>
                             <td class="text-end text-nowrap">${ic.v.toFixed(2)} m/s</td>
                             <td class="text-end text-nowrap">${Math.round(ic.E)} J</td>
                         </tr>`);
@@ -1080,6 +1342,7 @@
             currentDrop() { return this.plan.drops[this.idx]; },
 
             select(i, refit = false) {
+                if (!this.hasDrops()) return;
                 const n = this.plan.drops.length;
                 this.idx = ((i % n) + n) % n;
                 const dr = this.currentDrop();
@@ -1101,11 +1364,13 @@
             },
 
             drop() {
+                if (!this.hasDrops()) return;
                 if (sim.state === 'done') sim.setDrop(this.currentDrop());
                 sim.release();
             },
 
             startAuto() {
+                if (!this.hasDrops()) return;
                 this.auto = true;
                 $('btnAuto').innerHTML = '<i class="fa-solid fa-stop me-1"></i>Dừng';
                 $('btnAuto').classList.replace('btn-success', 'btn-warning');
@@ -1142,18 +1407,19 @@
         // 6. KHỞI TẠO & SỰ KIỆN
         // =====================================================================
         const critSel = $('criticalEl');
-        allElements().forEach(el => {
+        // Lần 16 của 3A: "most critical or damage-prone flat orientation" → chỉ chọn mặt
+        allElements().filter(el => el.length === 1).forEach(el => {
             const o = document.createElement('option');
             o.value = el.join('-');
-            o.textContent = elName(el) + (el.length === 1 ? ` (${FACES[el[0]].name})` : '');
-            if (o.value === '2-3-5') o.selected = true;
+            o.textContent = `${elName(el)} (${FACES[el[0]].name})`;
+            if (o.value === '1') o.selected = true;
             critSel.appendChild(o);
         });
 
         $('qcForm').addEventListener('submit', (e) => { e.preventDefault(); app.calculate(); });
         ['testStandard', 'grossWeight'].forEach(id => $(id).addEventListener('input', () => app.toggleOptions()));
         $('testStandard').addEventListener('change', () => app.calculate());
-        ['level2C', 'pkgType', 'criticalEl'].forEach(id => $(id).addEventListener('change', () => app.calculate()));
+        ['level2C', 'shock2C', 'orient2C', 'noFace1', 'firstCorner', 'pkgType', 'criticalEl'].forEach(id => $(id).addEventListener('change', () => app.calculate()));
         $('btnDrop').addEventListener('click', () => app.drop());
         $('btnReset').addEventListener('click', () => { app.stopAuto(); sim.setDrop(app.currentDrop()); });
         $('btnNext').addEventListener('click', () => { app.stopAuto(); app.select(app.idx + 1); });
