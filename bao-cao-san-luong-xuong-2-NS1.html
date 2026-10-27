@@ -62,6 +62,33 @@
                 <p class="mb-0 opacity-75">Sản lượng tuần theo chuyền · dữ liệu trực tiếp từ Google Sheet (Apps Script)</p>
             </div>
 
+            <!-- ==================== TÌNH TRẠNG MÁY BÀO 4 MẶT (COUNTER TRỰC TIẾP) ==================== -->
+            <style>
+                .mb4-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px 16px; background: #fff; height: 100%; border-top: 4px solid #9ca3af; }
+                .mb4-card.run { border-top-color: #16a34a; }
+                .mb4-card.stop { border-top-color: #dc2626; }
+                .mb4-badge { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: #f3f4f6; color: #6b7280; }
+                .mb4-card.run .mb4-badge { background: #dcfce7; color: #15803d; }
+                .mb4-card.stop .mb4-badge { background: #fee2e2; color: #b91c1c; }
+                .mb4-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+                .mb4-card.run .mb4-dot { animation: mb4-pulse 1.4s infinite; }
+                @keyframes mb4-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+                .mb4-qty { font-size: 1.9rem; font-weight: 800; line-height: 1.1; color: #064e3b; font-variant-numeric: tabular-nums; }
+                .mb4-meta { font-size: .8rem; color: #6b7280; }
+                .mb4-meta code { color: #1F4E78; font-size: .8rem; }
+            </style>
+            <div class="card card-custom p-3 p-md-4 mb-4" id="mb4Panel">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-gears me-2 text-lime-dark"></i>Tình trạng máy bào 4 mặt (counter trực tiếp)</h5>
+                    <div class="mb4-meta">
+                        <span id="mb4Updated">Đang tải dữ liệu…</span>
+                        <button type="button" class="btn btn-sm btn-outline-success ms-2 py-0" id="mb4Refresh"><i class="bi bi-arrow-clockwise"></i></button>
+                    </div>
+                </div>
+                <div class="row g-3 justify-content-center" id="mb4Grid"></div>
+                <div class="mb4-meta mt-3">Tự cập nhật mỗi 5 phút · "Đang chạy" khi counter ghi nhận sản lượng trong 11 phút gần nhất · Sản lượng tính từ 00:00 hôm nay.</div>
+            </div>
+
             <!-- Trang báo cáo gốc được nhúng qua iframe để giữ nguyên style riêng, không ảnh hưởng style của site -->
             <div class="card card-custom overflow-hidden">
                 <iframe id="reportFrame" src="/NS1_BCSL/bao-cao-san-luong.html" title="Báo cáo sản lượng Xưởng 2 - Chi Nhánh (NS1)"
@@ -89,6 +116,127 @@
                     fit();
                 } catch (e) { /* khác domain: giữ chiều cao mặc định 80vh */ }
             });
+        })();
+    </script>
+    <script>
+        // Tình trạng máy bào 4 mặt: đọc trực tiếp Google Sheet (chia sẻ công khai) qua Google Visualization API.
+        // Truy vấn được lọc/tổng hợp phía Google nên dữ liệu trả về rất nhỏ, không bị giới hạn quota như Apps Script webhook.
+        (function () {
+            var SHEET_ID = '10gA5hVELRlwOm1NeAdonI6zHx7pJksoKAkBy_Blv6aI';
+            var MACHINES = ['M-BAO4M-01', 'M-BAO4M-02', 'M-BAO4M-03', 'M-BAO4M-04', 'M-BAO4M-05'];
+            var RUN_WINDOW_MIN = 11;              // counter gửi mỗi 5 phút → 2 chu kỳ + 1 phút trễ
+            var REFRESH_MS = 5 * 60 * 1000;
+            // Trình duyệt không đọc được tên wifi (SSID) → nhận biết wifi xưởng (CNxuong2) qua IP công cộng của mạng xưởng.
+            // Điền IP công cộng của wifi CNxuong2 vào đây; để trống [] thì không kiểm tra (link mở bình thường).
+            var FACTORY_PUBLIC_IPS = [];
+            var viewerIp = null;                  // IP công cộng của người xem, lấy 1 lần khi tải trang
+
+            var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+            var tqDate = function (d) {
+                return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' +
+                    pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+            };
+            var hm = function (d) { return d ? pad(d.getHours()) + ':' + pad(d.getMinutes()) : '--:--'; };
+            var dmyhm = function (d) { return d ? pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' ' + hm(d) : '—'; };
+            var parseGDate = function (v) {
+                var m = /Date\(([^)]*)\)/.exec(v || '');
+                if (!m) return null;
+                var p = m[1].split(',').map(Number);
+                return new Date(p[0], p[1], p[2] || 1, p[3] || 0, p[4] || 0, p[5] || 0);
+            };
+
+            function query(sheet, tq) {
+                var url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json' +
+                    '&sheet=' + encodeURIComponent(sheet) + '&tq=' + encodeURIComponent(tq);
+                return fetch(url, { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
+                    var json = JSON.parse(t.substring(t.indexOf('{'), t.lastIndexOf('}') + 1));
+                    if (json.status !== 'ok') throw new Error((json.errors && json.errors[0] && json.errors[0].detailed_message) || 'Lỗi truy vấn');
+                    return json.table.rows.map(function (row) { return row.c.map(function (c) { return c ? c.v : null; }); });
+                });
+            }
+
+            function render(data, now) {
+                document.getElementById('mb4Grid').innerHTML = MACHINES.map(function (id) {
+                    var d = data[id];
+                    var running = d.recent > 0;
+                    var cls = running ? 'run' : 'stop';
+                    var label = running ? 'Đang chạy' : 'Đang dừng';
+                    var note = d.lastSignal ? 'Tín hiệu SL cuối: ' + dmyhm(d.lastSignal) : 'Chưa có sản lượng hôm nay';
+                    var ipHtml = d.ip
+                        ? '<a class="mb4-counter-link" href="http://' + d.ip + '/" target="_blank" rel="noopener" title="Mở trang counter trực tiếp"><code>' + d.ip + '</code> <i class="bi bi-box-arrow-up-right"></i></a>'
+                        : '<code>—</code>';
+                    return '<div class="col-12 col-sm-6 col-md-4 col-xl">' +
+                        '<div class="mb4-card ' + cls + '">' +
+                        '<div class="d-flex justify-content-between align-items-center mb-2">' +
+                        '<span class="fw-bold">' + id + '</span>' +
+                        '<span class="mb4-badge"><span class="mb4-dot"></span>' + label + '</span></div>' +
+                        '<div class="mb4-meta">Sản lượng hôm nay</div>' +
+                        '<div class="mb4-qty">' + d.total.toLocaleString('vi-VN') + '</div>' +
+                        '<div class="mb4-meta mt-2"><i class="bi bi-router me-1"></i>IP: ' + ipHtml + '</div>' +
+                        '<div class="mb4-meta"><i class="bi bi-power me-1"></i>Mở máy cuối: ' + dmyhm(d.lastBoot) + '</div>' +
+                        '<div class="mb4-meta"><i class="bi bi-clock-history me-1"></i>' + note + '</div>' +
+                        '</div></div>';
+                }).join('');
+                document.getElementById('mb4Updated').textContent = 'Cập nhật lúc ' + hm(now) + ':' + pad(now.getSeconds());
+            }
+
+            function load() {
+                var now = new Date();
+                var startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                var recentFrom = new Date(now.getTime() - RUN_WINDOW_MIN * 60000);
+                var filter = " A starts with 'M-BAO4M'";
+                document.getElementById('mb4Updated').textContent = 'Đang tải dữ liệu…';
+                if (FACTORY_PUBLIC_IPS.length) detectViewerIp();   // cập nhật lại phòng khi người xem đổi mạng
+
+                Promise.all([
+                    // Ghi_San_Luong: A=Ma_May, D=Thoi_Gian_Cuoi, E=So_Luong
+                    query('Ghi_San_Luong', 'select A, sum(E), max(D) where' + filter + " and D >= datetime '" + tqDate(startOfDay) + "' group by A"),
+                    query('Ghi_San_Luong', 'select A, sum(E) where' + filter + " and D >= datetime '" + tqDate(recentFrom) + "' group by A"),
+                    // Chay_May_Thuc_Te: A=Ma_May, C=IP_May, D=Gio_Nhan_Thong_Tin
+                    query('Chay_May_Thuc_Te', 'select A, C, max(D) where' + filter + ' group by A, C')
+                ]).then(function (res) {
+                    var data = {};
+                    MACHINES.forEach(function (id) { data[id] = { total: 0, recent: 0, lastSignal: null, ip: '', lastBoot: null }; });
+                    res[0].forEach(function (r) { if (data[r[0]]) { data[r[0]].total = r[1] || 0; data[r[0]].lastSignal = parseGDate(r[2]); } });
+                    res[1].forEach(function (r) { if (data[r[0]]) data[r[0]].recent = r[1] || 0; });
+                    res[2].forEach(function (r) {
+                        var d = data[r[0]], t = parseGDate(r[2]);
+                        if (d && t && (!d.lastBoot || t > d.lastBoot)) { d.lastBoot = t; d.ip = r[1]; }
+                    });
+                    render(data, now);
+                }).catch(function (err) {
+                    document.getElementById('mb4Updated').textContent = 'Không tải được dữ liệu (' + err.message + ') – sẽ thử lại sau 5 phút';
+                });
+            }
+
+            function detectViewerIp() {
+                return fetch('https://api.ipify.org?format=json', { cache: 'no-store' })
+                    .then(function (r) { return r.json(); })
+                    .then(function (j) { viewerIp = j.ip; return viewerIp; })
+                    .catch(function () { return null; });
+            }
+
+            // Chỉ cho mở trang counter khi đang ở wifi xưởng
+            document.getElementById('mb4Grid').addEventListener('click', function (e) {
+                var link = e.target.closest('.mb4-counter-link');
+                if (!link || !FACTORY_PUBLIC_IPS.length) return;
+                if (viewerIp && FACTORY_PUBLIC_IPS.indexOf(viewerIp) >= 0) return;
+                e.preventDefault();
+                var msg = 'Trang counter chỉ mở được khi điện thoại/máy tính đang kết nối wifi tại xưởng (CNxuong2).';
+                if (viewerIp) {
+                    alert(msg + '\n\nIP mạng hiện tại: ' + viewerIp);
+                } else {
+                    // Chưa xác định được IP (mạng chậm/bị chặn) → thử lại một lần
+                    detectViewerIp().then(function (ip) {
+                        if (ip && FACTORY_PUBLIC_IPS.indexOf(ip) >= 0) window.open(link.href, '_blank', 'noopener');
+                        else alert(msg + (ip ? '\n\nIP mạng hiện tại: ' + ip : ''));
+                    });
+                }
+            });
+
+            document.getElementById('mb4Refresh').addEventListener('click', load);
+            load();
+            setInterval(load, REFRESH_MS);
         })();
     </script>
 </body>
