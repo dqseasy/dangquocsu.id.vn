@@ -76,17 +76,42 @@
                 .mb4-qty { font-size: 1.9rem; font-weight: 800; line-height: 1.1; color: #064e3b; font-variant-numeric: tabular-nums; }
                 .mb4-meta { font-size: .8rem; color: #6b7280; }
                 .mb4-meta code { color: #1F4E78; font-size: .8rem; }
+                .mb4-time { display: flex; justify-content: space-between; font-size: .8rem; padding: 6px 8px; margin-top: 8px; border-radius: 8px; background: #f9fafb; }
+                .mb4-time b { font-variant-numeric: tabular-nums; }
+                .mb4-total { display: inline-flex; align-items: center; gap: 8px; padding: 4px 14px; border-radius: 999px; background: #064e3b; color: #fff; font-size: .85rem; box-shadow: 0 2px 6px rgba(6, 78, 59, .25); }
+                .mb4-total i { color: #a3e635; }
+                .mb4-total b { font-size: 1.25rem; font-weight: 800; color: #a3e635; font-variant-numeric: tabular-nums; }
+                .mb4-week th, .mb4-week td { font-size: .85rem; vertical-align: middle; white-space: nowrap; }
+                .mb4-week td.num { text-align: right; font-variant-numeric: tabular-nums; }
+                .mb4-week tr.mb4-sum td { font-weight: 700; background: #f0fdf4; }
+                .mb4-week td.mb4-machine { font-weight: 700; background: #fff; }
             </style>
             <div class="card card-custom p-3 p-md-4 mb-4" id="mb4Panel">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                     <h5 class="fw-bold mb-0"><i class="fa-solid fa-gears me-2 text-lime-dark"></i>Tình trạng máy bào 4 mặt (counter trực tiếp)</h5>
-                    <div class="mb4-meta">
+                    <div class="mb4-meta d-flex flex-wrap align-items-center gap-2">
+                        <label for="mb4Date" class="mb-0">Ngày xem:</label>
+                        <input type="date" id="mb4Date" class="form-control form-control-sm" style="width:auto">
+                        <button type="button" class="btn btn-sm btn-outline-secondary py-0" id="mb4Today">Hôm nay</button>
+                        <span class="mb4-total" title="Tổng số phôi của 5 máy trong ngày đang xem"><i class="fa-solid fa-cubes"></i><span id="mb4TotalLabel">Tổng phôi hôm nay</span><b id="mb4Total">—</b></span>
                         <span id="mb4Updated">Đang tải dữ liệu…</span>
-                        <button type="button" class="btn btn-sm btn-outline-success ms-2 py-0" id="mb4Refresh"><i class="bi bi-arrow-clockwise"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-success py-0" id="mb4Refresh"><i class="bi bi-arrow-clockwise"></i></button>
                     </div>
                 </div>
                 <div class="row g-3 justify-content-center" id="mb4Grid"></div>
-                <div class="mb4-meta mt-3">Tự cập nhật mỗi 5 phút · "Đang chạy" khi counter ghi nhận sản lượng trong 11 phút gần nhất · Sản lượng tính từ 00:00 hôm nay.</div>
+                <div class="mb4-meta mt-3">Tự cập nhật mỗi 5 phút khi xem ngày hôm nay · "Đang chạy" khi counter ghi nhận sản lượng trong 11 phút gần nhất ·
+                    TG chạy = từ lần mở máy đầu tiên trong ngày (Chay_May_Thuc_Te) đến giờ cuối còn ghi sản lượng (đã gồm thời gian dừng) ·
+                    TG dừng = tổng các lần dừng trong ngày (Ghi_Dung_May), không tính bản ghi dừng qua đêm.</div>
+
+                <h6 class="fw-bold mt-4 mb-2"><i class="bi bi-calendar-week me-2 text-lime-dark"></i><span id="mb4WeekTitle">Tổng hợp 7 ngày</span></h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered mb-0 mb4-week">
+                        <thead class="table-light">
+                            <tr><th>Máy</th><th>Ngày</th><th class="text-end">Sản lượng</th><th class="text-end">TG chạy (phút)</th><th class="text-end">TG dừng (phút)</th><th class="text-end">Dừng / Chạy</th></tr>
+                        </thead>
+                        <tbody id="mb4WeekBody"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Trang báo cáo gốc được nhúng qua iframe để giữ nguyên style riêng, không ảnh hưởng style của site -->
@@ -155,55 +180,149 @@
                 });
             }
 
-            function render(data, now) {
+            var dateEl = document.getElementById('mb4Date');
+            var WEEKDAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+            var ymd = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+            var dm = function (d) { return pad(d.getDate()) + '/' + pad(d.getMonth() + 1); };
+            var addDays = function (d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); };
+            var fmtNum = function (n) { return Math.round(n).toLocaleString('vi-VN'); };
+            var fmtPct = function (stop, run) { return run > 0 ? (stop / run * 100).toFixed(1).replace('.', ',') + '%' : '—'; };
+            var startOfToday = function () { var n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); };
+            var selectedDay = function () {
+                var p = (dateEl.value || '').split('-').map(Number);
+                return p.length === 3 && p[0] ? new Date(p[0], p[1] - 1, p[2]) : startOfToday();
+            };
+            var viewingToday = function () { return dateEl.value === ymd(startOfToday()); };
+
+            // Thời gian chạy/dừng của 1 máy trong 1 ngày:
+            // chạy = lần mở máy đầu tiên → giờ cuối còn ghi sản lượng (đã bao gồm thời gian dừng);
+            // dừng = hợp các khoảng dừng trong ngày (cắt trong khung chạy)
+            function dayTimes(s) {
+                var start = s.boot || s.firstSL, end = s.lastSL;
+                if (!start || !end || end <= start) return null;
+                var stops = s.stops
+                    .map(function (x) { return [Math.max(x[0], start), Math.min(x[1], end)]; })
+                    .filter(function (x) { return x[1] > x[0]; })
+                    .sort(function (a, b) { return a[0] - b[0]; });
+                var stopMs = 0, curS = null, curE = null;
+                stops.forEach(function (x) {
+                    if (curE === null || x[0] > curE) { if (curE !== null) stopMs += curE - curS; curS = x[0]; curE = x[1]; }
+                    else if (x[1] > curE) curE = x[1];
+                });
+                if (curE !== null) stopMs += curE - curS;
+                var stopMin = stopMs / 60000, spanMin = (end - start) / 60000;
+                return { start: start, end: end, stopMin: stopMin, runMin: spanMin, bootFallback: !s.boot };
+            }
+
+            function render(data, days, day, now) {
+                var key = ymd(day), live = viewingToday();
+                var dayTotal = MACHINES.reduce(function (sum, id) { var s = data[id].days[key]; return sum + (s ? s.qty : 0); }, 0);
+                document.getElementById('mb4TotalLabel').textContent = live ? 'Tổng phôi hôm nay' : 'Tổng phôi ngày ' + dm(day);
+                document.getElementById('mb4Total').textContent = fmtNum(dayTotal);
                 document.getElementById('mb4Grid').innerHTML = MACHINES.map(function (id) {
-                    var d = data[id];
-                    var running = d.recent > 0;
-                    var cls = running ? 'run' : 'stop';
-                    var label = running ? 'Đang chạy' : 'Đang dừng';
-                    var note = d.lastSignal ? 'Tín hiệu SL cuối: ' + dmyhm(d.lastSignal) : 'Chưa có sản lượng hôm nay';
+                    var d = data[id], s = d.days[key] || { qty: 0 }, t = s.times;
+                    var cls = live ? (d.recent > 0 ? 'run' : 'stop') : '';
+                    var label = live ? (d.recent > 0 ? 'Đang chạy' : 'Đang dừng') : 'Xem lại ' + dm(day);
+                    var note = s.lastSL ? 'Tín hiệu SL cuối: ' + dmyhm(s.lastSL) : 'Không có sản lượng trong ngày';
                     var ipHtml = d.ip
                         ? '<a class="mb4-counter-link" href="http://' + d.ip + '/" target="_blank" rel="noopener" title="Mở trang counter trực tiếp"><code>' + d.ip + '</code> <i class="bi bi-box-arrow-up-right"></i></a>'
                         : '<code>—</code>';
+                    var timeHtml = t
+                        ? '<div class="mb4-time"><span>Dừng / Chạy</span><b>' + fmtNum(t.stopMin) + ' / ' + fmtNum(t.runMin) + ' phút</b></div>' +
+                          '<div class="mb4-meta d-flex justify-content-between mt-1"><span>Tỷ lệ dừng/chạy</span><b>' + fmtPct(t.stopMin, t.runMin) + '</b></div>' +
+                          '<div class="mb4-meta">Khung tính: ' + hm(t.start) + (t.bootFallback ? '*' : '') + ' → ' + hm(t.end) + '</div>'
+                        : '<div class="mb4-time"><span>Dừng / Chạy</span><b>—</b></div>';
                     return '<div class="col-12 col-sm-6 col-md-4 col-xl">' +
                         '<div class="mb4-card ' + cls + '">' +
                         '<div class="d-flex justify-content-between align-items-center mb-2">' +
                         '<span class="fw-bold">' + id + '</span>' +
                         '<span class="mb4-badge"><span class="mb4-dot"></span>' + label + '</span></div>' +
-                        '<div class="mb4-meta">Sản lượng hôm nay</div>' +
-                        '<div class="mb4-qty">' + d.total.toLocaleString('vi-VN') + '</div>' +
+                        '<div class="mb4-meta">' + (live ? 'Sản lượng hôm nay' : 'Sản lượng ngày ' + dm(day)) + '</div>' +
+                        '<div class="mb4-qty">' + fmtNum(s.qty) + '</div>' +
+                        timeHtml +
                         '<div class="mb4-meta mt-2"><i class="bi bi-router me-1"></i>IP: ' + ipHtml + '</div>' +
                         '<div class="mb4-meta"><i class="bi bi-power me-1"></i>Mở máy cuối: ' + dmyhm(d.lastBoot) + '</div>' +
                         '<div class="mb4-meta"><i class="bi bi-clock-history me-1"></i>' + note + '</div>' +
                         '</div></div>';
                 }).join('');
+
+                // Bảng tổng hợp 7 ngày, nhóm theo máy
+                document.getElementById('mb4WeekTitle').textContent = 'Tổng hợp 7 ngày (' + dm(days[0]) + ' – ' + dm(days[days.length - 1]) + ')';
+                document.getElementById('mb4WeekBody').innerHTML = MACHINES.map(function (id) {
+                    var d = data[id];
+                    var rows = days.filter(function (x) { return d.days[ymd(x)]; });
+                    if (!rows.length) return '<tr><td class="mb4-machine">' + id + '</td><td colspan="5" class="text-muted">Không có dữ liệu trong 7 ngày</td></tr>';
+                    var sum = { qty: 0, run: 0, stop: 0 };
+                    var html = rows.map(function (x, i) {
+                        var s = d.days[ymd(x)], t = s.times;
+                        sum.qty += s.qty;
+                        if (t) { sum.run += t.runMin; sum.stop += t.stopMin; }
+                        return '<tr>' + (i === 0 ? '<td class="mb4-machine" rowspan="' + (rows.length + 1) + '">' + id + '</td>' : '') +
+                            '<td>' + WEEKDAYS[x.getDay()] + ' ' + dm(x) + '</td>' +
+                            '<td class="num">' + fmtNum(s.qty) + '</td>' +
+                            '<td class="num">' + (t ? fmtNum(t.runMin) : '—') + '</td>' +
+                            '<td class="num">' + (t ? fmtNum(t.stopMin) : '—') + '</td>' +
+                            '<td class="num">' + (t ? fmtPct(t.stopMin, t.runMin) : '—') + '</td></tr>';
+                    }).join('');
+                    return html + '<tr class="mb4-sum"><td>Cộng</td><td class="num">' + fmtNum(sum.qty) + '</td><td class="num">' + fmtNum(sum.run) +
+                        '</td><td class="num">' + fmtNum(sum.stop) + '</td><td class="num">' + fmtPct(sum.stop, sum.run) + '</td></tr>';
+                }).join('');
+
                 document.getElementById('mb4Updated').textContent = 'Cập nhật lúc ' + hm(now) + ':' + pad(now.getSeconds());
             }
 
             function load() {
                 var now = new Date();
-                var startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                var day = selectedDay();
+                var weekFrom = addDays(day, -6), weekTo = addDays(day, 1);
+                var days = [];
+                for (var i = 0; i < 7; i++) days.push(addDays(weekFrom, i));
                 var recentFrom = new Date(now.getTime() - RUN_WINDOW_MIN * 60000);
                 var filter = " A starts with 'M-BAO4M'";
+                var range = function (col) { return ' and ' + col + " >= datetime '" + tqDate(weekFrom) + "' and " + col + " < datetime '" + tqDate(weekTo) + "'"; };
                 document.getElementById('mb4Updated').textContent = 'Đang tải dữ liệu…';
                 if (FACTORY_PUBLIC_IPS.length) detectViewerIp();   // cập nhật lại phòng khi người xem đổi mạng
 
                 Promise.all([
-                    // Ghi_San_Luong: A=Ma_May, D=Thoi_Gian_Cuoi, E=So_Luong
-                    query('Ghi_San_Luong', 'select A, sum(E), max(D) where' + filter + " and D >= datetime '" + tqDate(startOfDay) + "' group by A"),
-                    query('Ghi_San_Luong', 'select A, sum(E) where' + filter + " and D >= datetime '" + tqDate(recentFrom) + "' group by A"),
-                    // Chay_May_Thuc_Te: A=Ma_May, C=IP_May, D=Gio_Nhan_Thong_Tin
-                    query('Chay_May_Thuc_Te', 'select A, C, max(D) where' + filter + ' group by A, C')
+                    // Ghi_San_Luong: A=Ma_May, C=Thoi_Gian_Dau, D=Thoi_Gian_Cuoi, E=So_Luong → theo ngày
+                    query('Ghi_San_Luong', 'select A, toDate(D), sum(E), min(C), max(D) where' + filter + range('D') + ' group by A, toDate(D)'),
+                    // Chay_May_Thuc_Te: A=Ma_May, B=Thoi_Gian_Mo_May, C=IP_May, D=Gio_Nhan_Thong_Tin
+                    query('Chay_May_Thuc_Te', 'select A, toDate(B), min(B) where' + filter + range('B') + ' group by A, toDate(B)'),
+                    // Ghi_Dung_May: A=Ma_May, B=Thoi_Gian_Dung, C=Thoi_Gian_Chay_Lai
+                    query('Ghi_Dung_May', 'select A, B, C where' + filter + range('B') + ' and C is not null'),
+                    query('Chay_May_Thuc_Te', 'select A, C, max(D) where' + filter + ' group by A, C'),
+                    viewingToday()
+                        ? query('Ghi_San_Luong', 'select A, sum(E) where' + filter + " and D >= datetime '" + tqDate(recentFrom) + "' group by A")
+                        : Promise.resolve([])
                 ]).then(function (res) {
                     var data = {};
-                    MACHINES.forEach(function (id) { data[id] = { total: 0, recent: 0, lastSignal: null, ip: '', lastBoot: null }; });
-                    res[0].forEach(function (r) { if (data[r[0]]) { data[r[0]].total = r[1] || 0; data[r[0]].lastSignal = parseGDate(r[2]); } });
-                    res[1].forEach(function (r) { if (data[r[0]]) data[r[0]].recent = r[1] || 0; });
+                    MACHINES.forEach(function (id) { data[id] = { days: {}, recent: 0, ip: '', lastBoot: null }; });
+                    var dayOf = function (id, v) {
+                        var dt = parseGDate(v), k = dt && ymd(dt);
+                        if (!data[id] || !k) return null;
+                        return data[id].days[k] || (data[id].days[k] = { qty: 0, boot: null, firstSL: null, lastSL: null, stops: [] });
+                    };
+                    res[0].forEach(function (r) { var s = dayOf(r[0], r[1]); if (s) { s.qty = r[2] || 0; s.firstSL = parseGDate(r[3]); s.lastSL = parseGDate(r[4]); } });
+                    res[1].forEach(function (r) { var s = dayOf(r[0], r[1]); if (s) s.boot = parseGDate(r[2]); });
                     res[2].forEach(function (r) {
+                        var b = parseGDate(r[1]), c = parseGDate(r[2]);
+                        // Bỏ các bản ghi dừng qua đêm (dừng và chạy lại khác ngày)
+                        var s = b && c && c > b && ymd(b) === ymd(c) && dayOf(r[0], r[1]);
+                        if (s) s.stops.push([b.getTime(), c.getTime()]);
+                    });
+                    MACHINES.forEach(function (id) {
+                        Object.keys(data[id].days).forEach(function (k) {
+                            var s = data[id].days[k];
+                            if (s.lastSL) s.times = dayTimes({ boot: s.boot && s.boot.getTime(), firstSL: s.firstSL && s.firstSL.getTime(), lastSL: s.lastSL.getTime(), stops: s.stops });
+                            if (s.times) { s.times.start = new Date(s.times.start); s.times.end = new Date(s.times.end); }
+                        });
+                    });
+                    res[3].forEach(function (r) {
                         var d = data[r[0]], t = parseGDate(r[2]);
                         if (d && t && (!d.lastBoot || t > d.lastBoot)) { d.lastBoot = t; d.ip = r[1]; }
                     });
-                    render(data, now);
+                    res[4].forEach(function (r) { if (data[r[0]]) data[r[0]].recent = r[1] || 0; });
+                    render(data, days, day, now);
                 }).catch(function (err) {
                     document.getElementById('mb4Updated').textContent = 'Không tải được dữ liệu (' + err.message + ') – sẽ thử lại sau 5 phút';
                 });
@@ -234,9 +353,13 @@
                 }
             });
 
+            dateEl.value = dateEl.max = ymd(startOfToday());
+            dateEl.addEventListener('change', load);
+            document.getElementById('mb4Today').addEventListener('click', function () { dateEl.value = dateEl.max = ymd(startOfToday()); load(); });
             document.getElementById('mb4Refresh').addEventListener('click', load);
             load();
-            setInterval(load, REFRESH_MS);
+            // Chỉ tự cập nhật khi đang xem ngày hôm nay (dữ liệu ngày cũ không đổi)
+            setInterval(function () { if (viewingToday()) load(); }, REFRESH_MS);
         })();
     </script>
 </body>
