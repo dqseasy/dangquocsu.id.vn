@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Báo cáo Lệnh sản xuất – Trí Cao</title>
+<meta name="description" content="Tình trạng lệnh sản xuất và sản lượng theo công đoạn Trí Cao, đọc trực tiếp từ Google Sheet TriCaoMasterData.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#fff; --text:#1d2733; --muted:#6b7785; --line:#e3e7ec;
+    --brand:#8a5a2b; --brand-soft:#f3ebe2;
+    --blue:#2f6fde; --green:#1f9d55; --amber:#d48a00; --red:#d64545; --gray:#8a94a3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+  header{background:var(--brand);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:18px;margin:0;flex:1;min-width:220px}
+  header small{opacity:.85}
+  button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:6px;padding:6px 12px}
+  header button{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.4)}
+  header a{color:#fff;opacity:.85;text-decoration:none;font-size:13px}
+  header a:hover{opacity:1;text-decoration:underline}
+  main{padding:16px 20px;max-width:1500px;margin:0 auto}
+  /* Tab con */
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;overflow-x:auto}
+  .tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:9px 14px;color:var(--muted);font-weight:600;white-space:nowrap}
+  .tabs button.on{color:var(--brand);border-bottom-color:var(--brand)}
+  .tab{display:none}
+  .tab.on{display:block}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .kpi .l{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  .kpi .v{font-size:26px;font-weight:600;margin-top:2px}
+  .kpi .v small{font-size:14px;font-weight:500;color:var(--muted)}
+  .kpi.warn .v{color:var(--red)}
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .filters input,.filters select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff}
+  .filters input#q{flex:1;min-width:220px}
+  .filters .fld{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px}
+  .filters .grp{display:flex}
+  .filters .grp button{border-radius:0;margin-left:-1px}
+  .filters .grp button:first-child{border-radius:6px 0 0 6px;margin-left:0}
+  .filters .grp button:last-child{border-radius:0 6px 6px 0}
+  .filters .grp button.on{background:var(--brand-soft);border-color:#d9c4ad;color:var(--brand);font-weight:600}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;white-space:nowrap}
+  th{background:#fafbfc;color:var(--muted);font-weight:600;font-size:12px;position:sticky;top:0}
+  td.wrap{white-space:normal;min-width:220px}
+  td.r,th.r{text-align:right}
+  tr.lsx{cursor:pointer}
+  tr.lsx:hover{background:#fbf8f4}
+  tr.lsx.open{background:var(--brand-soft)}
+  tr.sub>td{background:#fcfcfd;padding:10px 14px 14px 34px}
+  .sub table th{background:#f4f6f8}
+  tr.psx{cursor:pointer}
+  tr.psx:hover{background:#eef4ff}
+  .caret{display:inline-block;width:14px;color:var(--muted);transition:transform .15s}
+  .open .caret{transform:rotate(90deg)}
+  .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:#eef0f3;color:var(--gray)}
+  .b-new{background:#eef0f3;color:#5b6573}
+  .b-run{background:#e5eefc;color:var(--blue)}
+  .b-done{background:#e3f5ea;color:var(--green)}
+  .b-hold{background:#fdf2dc;color:var(--amber)}
+  .b-late{background:#fde7e7;color:var(--red);margin-left:4px}
+  .bar{display:flex;align-items:center;gap:8px;min-width:140px}
+  .bar .t{flex:1;height:8px;background:#e9edf1;border-radius:6px;overflow:hidden}
+  .bar .f{height:100%;background:var(--blue)}
+  .bar .f.full{background:var(--green)}
+  .bar span{font-size:12px;color:var(--muted);width:38px;text-align:right}
+  .steps{display:flex;gap:4px;flex-wrap:wrap}
+  .step{font-size:11px;padding:2px 6px;border-radius:4px;border:1px solid var(--line);color:var(--muted);background:#fff}
+  .step.done{background:#e3f5ea;border-color:#bfe6cd;color:var(--green)}
+  .step.cur{background:#e5eefc;border-color:#bcd2f7;color:var(--blue);font-weight:600}
+  .empty{padding:30px;text-align:center;color:var(--muted)}
+  .muted{color:var(--muted)}
+  /* Bảng tổng hợp sản lượng ngày × công đoạn */
+  table.pv th,table.pv td{text-align:right;font-variant-numeric:tabular-nums}
+  table.pv th:first-child,table.pv td:first-child{text-align:left;position:sticky;left:0;background:#fff;z-index:1}
+  table.pv th:first-child{background:#fafbfc;z-index:2}
+  table.pv td{line-height:1.25}
+  table.pv td small{display:block;color:var(--muted);font-size:11.5px}
+  table.pv td.z{color:#c3cad3}
+  table.pv td.tot,table.pv th.tot{border-left:2px solid var(--line);font-weight:600}
+  table.pv tbody tr{cursor:pointer}
+  table.pv tbody tr:hover td{outline:1px solid #d9c4ad;outline-offset:-1px}
+  table.pv tfoot td{background:var(--brand-soft);font-weight:600;border-top:2px solid #d9c4ad}
+  table.pv tfoot td:first-child{background:var(--brand-soft)}
+  .dow{color:var(--muted);font-size:12px;margin-left:4px}
+  .note{font-size:12px;color:var(--muted);margin:8px 2px 0}
+  /* Ngăn chi tiết phiếu */
+  .overlay{position:fixed;inset:0;background:rgba(20,28,38,.45);display:none;z-index:10}
+  .overlay.show{display:block}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(1100px,100%);background:var(--bg);z-index:11;
+          transform:translateX(100%);transition:transform .2s;display:flex;flex-direction:column}
+  .drawer.show{transform:none}
+  .drawer .hd{background:#fff;border-bottom:1px solid var(--line);padding:14px 18px;display:flex;gap:12px;align-items:flex-start}
+  .drawer .hd h2{margin:0;font-size:17px}
+  .drawer .bd{padding:14px 18px;overflow:auto;flex:1}
+  .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 16px;margin:10px 0 14px}
+  .meta div b{display:block;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase}
+  .cell-ok{color:var(--green);font-weight:600}
+  .cell-part{color:var(--blue);font-weight:600}
+  .cell-zero{color:#b6bec8}
+  h3{font-size:14px;margin:18px 0 8px}
+  #loading{position:fixed;inset:0;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;z-index:20;font-size:15px}
+  @media (max-width:640px){ main{padding:12px} header{padding:12px} tr.sub>td{padding-left:12px} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Báo cáo tình trạng Lệnh sản xuất – Trí Cao<br><small id="capNhat">Đang tải…</small></h1>
+  <a href="/cong-cu-khac.html">← Other tools</a>
+  <button onclick="taiDuLieu()">⟳ Làm mới</button>
+</header>
+
+<main>
+  <nav class="tabs">
+    <button class="on" data-tab="tabLSX" onclick="chonTab(this)">Tình trạng lệnh sản xuất</button>
+    <button data-tab="tabSL" onclick="chonTab(this)">Sản lượng theo ngày</button>
+  </nav>
+
+  <!-- ===================== TAB 1: TÌNH TRẠNG LSX ===================== -->
+  <div class="tab on" id="tabLSX">
+    <section class="kpis" id="kpis"></section>
+
+    <section class="filters">
+      <input id="q" placeholder="Tìm số lệnh, tên lệnh, mã phiếu, vật liệu, nhãn chi tiết…" oninput="ve()">
+      <select id="fTT" onchange="ve()"><option value="">Tất cả trạng thái</option></select>
+      <label><input type="checkbox" id="fTre" onchange="ve()"> Chỉ lệnh trễ hạn</label>
+      <label><input type="checkbox" id="fAnHT" onchange="ve()"> Ẩn lệnh đã hoàn thành</label>
+    </section>
+
+    <section class="card"><div class="scroll"><table>
+      <thead><tr>
+        <th></th><th>Số LSX</th><th>Tên lệnh</th><th>Ngày cấp</th><th>Người cấp</th>
+        <th>Hạn hoàn thành</th><th>Trạng thái</th><th>Phiếu</th><th>Chi tiết</th><th>Tiến độ</th>
+      </tr></thead>
+      <tbody id="tbLSX"></tbody>
+    </table></div></section>
+  </div>
+
+  <!-- ===================== TAB 2: SẢN LƯỢNG THEO NGÀY ===================== -->
+  <div class="tab" id="tabSL">
+    <section class="kpis" id="kpisSL"></section>
+
+    <section class="filters">
+      <span class="fld">Từ <input type="date" id="slTu" onchange="veSL()"></span>
+      <span class="fld">đến <input type="date" id="slDen" onchange="veSL()"></span>
+      <span class="grp">
+        <button onclick="khoangNgay(7)">7 ngày</button><button onclick="khoangNgay(30)">30 ngày</button><button onclick="khoangNgay(0)">Tất cả</button>
+      </span>
+      <select id="slCD" onchange="veSL()"><option value="">Tất cả công đoạn</option></select>
+      <select id="slLSX" onchange="veSL()"><option value="">Tất cả lệnh SX</option></select>
+      <span class="grp" id="slHT">
+        <button data-v="ca" class="on" onclick="cheDoSL(this)">Chi tiết + m³</button><button data-v="sl" onclick="cheDoSL(this)">Số chi tiết</button><button data-v="m3" onclick="cheDoSL(this)">m³</button>
+      </span>
+    </section>
+
+    <section class="card"><div class="scroll" id="pvSL"></div></section>
+    <p class="note">Số chi tiết = tổng <b>So_Luong</b> ghi nhận trong ngày. m³ = Dài × Rộng × Dày (mm) × số lượng ÷ 10⁹, độ dày lấy từ vật liệu của phiếu (vd. “MLM 6626 <b>12mm</b>”). Bấm vào một ngày để xem từng lượt ghi.</p>
+  </div>
+</main>
+
+<div class="overlay" id="ov" onclick="dongPhieu()"></div>
+<aside class="drawer" id="dr">
+  <div class="hd"><div style="flex:1"><h2 id="drTitle"></h2><div id="drSub" class="muted"></div></div>
+    <button onclick="dongPhieu()">✕ Đóng</button></div>
+  <div class="bd" id="drBody"></div>
+</aside>
+
+<div id="loading">Đang tải dữ liệu…</div>
+
+<script>
+let D = null;            // dữ liệu thô
+let M = null;            // dữ liệu đã tính toán
+const moLSX = new Set(); // các lệnh đang mở rộng
+let hienSL = 'ca';       // chế độ hiển thị tab sản lượng: ca | sl | m3
+
+/* ---------- Đọc dữ liệu từ Google Sheet công khai (chỉ đọc) ---------- */
+// File TriCaoMasterData phải được chia sẻ "Bất kỳ ai có đường liên kết – Người xem"
+const SHEET_ID = '1FbqrHF-1mH2bcGf4zDJEKH4Eo--1OANcuGGiGM8jvz4';
+const SHEETS = {lsx:'LSX', psx:'Phieu_San_Xuat', ct:'Chi_Tiet_PSX', gsl:'Ghi_San_Luong', cd:'Cong_Doan', nd:'Nguoi_Dung'};
+
+/** Tách CSV (có hỗ trợ dấu ngoặc kép, dấu phẩy và xuống dòng trong ô) */
+function parseCSV(t){
+  const rows=[]; let row=[], f='', q=false;
+  for(let i=0;i<t.length;i++){
+    const c=t[i];
+    if(q){ if(c==='"'){ if(t[i+1]==='"'){ f+='"'; i++; } else q=false; } else f+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(f); f=''; }
+    else if(c==='\n'||c==='\r'){ if(c==='\r'&&t[i+1]==='\n') i++; row.push(f); rows.push(row); row=[]; f=''; }
+    else f+=c;
+  }
+  if(f!==''||row.length){ row.push(f); rows.push(row); }
+  return rows;
+}
+/** Đọc 1 sheet thành mảng object theo tên cột ở dòng 1, bỏ dòng trống */
+async function docSheet(ten){
+  const url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&headers=1&sheet='+encodeURIComponent(ten)+'&_='+Date.now();
+  const res=await fetch(url);
+  if(!res.ok) throw new Error('Không đọc được sheet '+ten+' (HTTP '+res.status+')');
+  const v=parseCSV(await res.text());
+  if(v.length<2) return [];
+  const head=v[0].map(x=>x.trim());
+  return v.slice(1).filter(r=>r.some(c=>c.trim()!=='')).map(r=>{
+    const o={}; head.forEach((k,i)=>{ if(k) o[k]=r[i]==null?'':r[i]; }); return o;
+  });
+}
+
+async function taiDuLieu(){
+  const ld=document.getElementById('loading');
+  ld.textContent='Đang tải dữ liệu…'; ld.style.display='flex';
+  try{
+    const keys=Object.keys(SHEETS);
+    const ds=await Promise.all(keys.map(k=>docSheet(SHEETS[k])));
+    D={}; keys.forEach((k,i)=>{ D[k]=ds[i]; });
+    tinhToan(); ve(); veSL();
+    const n=new Date();
+    document.getElementById('capNhat').textContent='Cập nhật lúc '+pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds())+' '+pad(n.getDate())+'/'+pad(n.getMonth()+1)+'/'+n.getFullYear();
+    ld.style.display='none';
+  }catch(e){
+    ld.textContent='Lỗi tải dữ liệu: '+e.message;
+  }
+}
+
+function chonTab(b){
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on', x===b));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x.id===b.dataset.tab));
+}
+
+/* ---------- Tiện ích ---------- */
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = v => { const n=parseFloat(String(v).replace(',','.')); return isNaN(n)?0:n; };
+const norm = s => String(s==null?'':s).trim().toUpperCase();
+const fSL = n => Math.round(n).toLocaleString('vi-VN');
+const fM3 = n => n.toLocaleString('vi-VN',{minimumFractionDigits:3,maximumFractionDigits:3});
+const pad = n => String(n).padStart(2,'0');
+const keyNgay = (y,m,d) => y+'-'+pad(m)+'-'+pad(d);           // yyyy-mm-dd, khớp với <input type="date">
+const hienNgay = k => k.slice(8)+'/'+k.slice(5,7)+'/'+k.slice(0,4);
+const THU = ['CN','T2','T3','T4','T5','T6','T7'];
+const thuCua = k => THU[new Date(+k.slice(0,4), +k.slice(5,7)-1, +k.slice(8)).getDay()];
+function parseNgay(s){ const m=String(s||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m?new Date(+m[3],m[2]-1,+m[1]):null; }
+/** Ngày của 1 lượt ghi sản lượng. Thoi_Gian có thể là "dd/MM/yyyy HH:mm" (ô kiểu ngày)
+ *  hoặc chuỗi JS "Thu Oct 22 2026 15:52:44 GMT+0700 (...)" – lấy đúng ngày ghi trong chuỗi. */
+const THANG = {JAN:1,FEB:2,MAR:3,APR:4,MAY:5,JUN:6,JUL:7,AUG:8,SEP:9,OCT:10,NOV:11,DEC:12};
+function ngayGhi(s){
+  s=String(s||'');
+  let m=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); if(m) return keyNgay(m[3],m[2],m[1]);
+  m=s.match(/\b([A-Za-z]{3})[a-z]*\s+(\d{1,2}),?\s+(\d{4})/); if(m && THANG[m[1].toUpperCase()]) return keyNgay(m[3],THANG[m[1].toUpperCase()],m[2]);
+  const d=new Date(s); return isNaN(d)?null:keyNgay(d.getFullYear(),d.getMonth()+1,d.getDate());
+}
+function gioGhi(s){ const m=String(s||'').match(/(\d{1,2}):(\d{2})/); return m?pad(m[1])+':'+m[2]:''; }
+/** Độ dày (mm) lấy từ tên vật liệu, vd. "MLM 6626 12mm" → 12 */
+function doDay(vl){ const m=String(vl||'').match(/(\d+(?:[.,]\d+)?)\s*mm\b/i); return m?num(m[1]):0; }
+function badge(tt){
+  const t=norm(tt); let c='b-new';
+  if(/HOÀN THÀNH|XONG|DONE/.test(t)) c='b-done';
+  else if(/ĐANG|SẢN XUẤT|RUN/.test(t)) c='b-run';
+  else if(/TẠM|DỪNG|HỦY|HUỶ|CHỜ/.test(t)) c='b-hold';
+  return '<span class="badge '+c+'">'+esc(tt||'—')+'</span>';
+}
+function bar(p){ const v=Math.round(p*100);
+  return '<div class="bar"><div class="t"><div class="f'+(v>=100?' full':'')+'" style="width:'+v+'%"></div></div><span>'+v+'%</span></div>'; }
+
+/* ---------- Tính tiến độ ---------- */
+function tinhToan(){
+  const cdTen={}; D.cd.forEach(c=>{ cdTen[norm(c.Ma_CD)]=c.Ten_Cong_Doan; });
+  const tenNguoi={}; D.nd.forEach(n=>{ tenNguoi[norm(n.Ma_NV)]=n.Ho_Ten; });
+  const tenCD = x => norm(cdTen[norm(x)] || x);   // Ghi_San_Luong có thể lưu mã CD hoặc tên CD
+
+  // Sản lượng đã làm: done[Ma_Dong][Tên công đoạn]
+  const done={}, logTheoDong={};
+  D.gsl.forEach(g=>{
+    const k=norm(g.Ma_Dong), cd=tenCD(g.Cong_Doan);
+    (done[k]=done[k]||{})[cd]=(done[k][cd]||0)+num(g.So_Luong);
+    (logTheoDong[k]=logTheoDong[k]||[]).push(g);
+  });
+
+  const ctTheoPSX={}; D.ct.forEach(c=>{ (ctTheoPSX[norm(c.Ma_PSX)]=ctTheoPSX[norm(c.Ma_PSX)]||[]).push(c); });
+
+  const psxTheoLSX={};
+  const psx=D.psx.map(p=>{
+    const steps=[]; for(let i=1;i<=11;i++){ const v=p['CD'+i]; if(v!==''&&v!=null && !steps.includes(norm(v))) steps.push(norm(v)); }
+    const lines=ctTheoPSX[norm(p.Ma_PSX)]||[];
+    let tong=0, xong=0;
+    const stepState=steps.map(s=>{
+      let t=0,x=0; lines.forEach(l=>{ const q=num(l.Tong_So_Luong); t+=q; x+=Math.min((done[norm(l.Ma_Dong)]||{})[s]||0,q); });
+      tong+=t; xong+=x; return {ten:s, tong:t, xong:x};
+    });
+    let curIdx=stepState.findIndex(s=>s.tong===0||s.xong<s.tong);
+    const pct = tong? xong/tong : (/HOÀN THÀNH/.test(norm(p.Trang_Thai))?1:0);
+    const o={...p, steps:stepState, curIdx, lines, pct,
+      nguoi: tenNguoi[norm(p.Nguoi_Thuc_Hien)]||p.Nguoi_Thuc_Hien,
+      searchText: norm([p.Ma_PSX,p.Vat_Lieu,p.Nguoi_Thuc_Hien].concat(lines.map(l=>l.Nhan)).join(' '))};
+    (psxTheoLSX[norm(p.Lenh_SX)]=psxTheoLSX[norm(p.Lenh_SX)]||[]).push(o);
+    return o;
+  });
+
+  const homNay=new Date(); homNay.setHours(0,0,0,0);
+  const lsx=D.lsx.map(l=>{
+    const ps=psxTheoLSX[norm(l.So_LSX)]||[];
+    const pct= ps.length? ps.reduce((a,p)=>a+p.pct,0)/ps.length : (/HOÀN THÀNH/.test(norm(l.Trang_Thai))?1:0);
+    const han=parseNgay(l.Ngay_Hoan_Thanh);
+    const tre= !!han && han<homNay && pct<1 && !/HOÀN THÀNH/.test(norm(l.Trang_Thai));
+    const soCT=ps.reduce((a,p)=>a+p.lines.length,0);
+    return {...l, psx:ps, pct, tre, soCT,
+      nguoi: tenNguoi[norm(l.Nguoi_Cap_Lenh)]||l.Nguoi_Cap_Lenh,
+      ownText: norm([l.So_LSX,l.Ten_LSX,l.Nguoi_Cap_Lenh,l.Trang_Thai].join(' ')),
+      searchText: norm([l.So_LSX,l.Ten_LSX,l.Nguoi_Cap_Lenh,l.Trang_Thai].join(' '))+' '+ps.map(p=>p.searchText).join(' ')};
+  });
+
+  // Từng lượt ghi sản lượng kèm ngày, công đoạn, số chi tiết và m³
+  const dongTheoMa={}; D.ct.forEach(c=>{ dongTheoMa[norm(c.Ma_Dong)]=c; });
+  const psxTheoMa={}; psx.forEach(p=>{ psxTheoMa[norm(p.Ma_PSX)]=p; });
+  const thuTuCD={}; D.cd.forEach((c,i)=>{ thuTuCD[norm(c.Ten_Cong_Doan)]=i; });
+  const sl=D.gsl.map(g=>{
+    const dong=dongTheoMa[norm(g.Ma_Dong)]||null, p=dong?psxTheoMa[norm(dong.Ma_PSX)]:null;
+    const q=num(g.So_Luong), dai=dong?num(dong.Dai):0, rong=dong?num(dong.Rong):0, day=p?doDay(p.Vat_Lieu):0;
+    const coKT=dai>0&&rong>0&&day>0;
+    return {g, ngay:ngayGhi(g.Thoi_Gian), cd:tenCD(g.Cong_Doan), q, m3: coKT? dai*rong*day*q/1e9 : 0, coKT,
+      dong, p, lsx: p?p.Lenh_SX:'', dai, rong, day};
+  }).filter(r=>r.ngay && r.cd);
+
+  M={lsx, psx, done, logTheoDong, tenNguoi, sl, thuTuCD};
+
+  // Danh sách trạng thái cho bộ lọc
+  const sel=document.getElementById('fTT'), cur=sel.value;
+  const tts=[...new Set(lsx.map(l=>l.Trang_Thai).filter(Boolean))];
+  sel.innerHTML='<option value="">Tất cả trạng thái</option>'+tts.map(t=>'<option'+(t===cur?' selected':'')+'>'+esc(t)+'</option>').join('');
+
+  // Bộ lọc công đoạn / lệnh cho tab sản lượng
+  const selCD=document.getElementById('slCD'), curCD=selCD.value;
+  selCD.innerHTML='<option value="">Tất cả công đoạn</option>'+sapCD([...new Set(sl.map(r=>r.cd))])
+    .map(c=>'<option'+(c===curCD?' selected':'')+'>'+esc(c)+'</option>').join('');
+  const selL=document.getElementById('slLSX'), curL=selL.value;
+  selL.innerHTML='<option value="">Tất cả lệnh SX</option>'+[...new Set(sl.map(r=>r.lsx).filter(Boolean))].sort()
+    .map(c=>'<option'+(c===curL?' selected':'')+'>'+esc(c)+'</option>').join('');
+}
+
+/** Sắp công đoạn theo thứ tự sheet Cong_Doan, công đoạn lạ xếp cuối theo tên */
+function sapCD(ds){
+  const t=M?M.thuTuCD:{};
+  return ds.sort((a,b)=>((a in t)?t[a]:999)-((b in t)?t[b]:999) || a.localeCompare(b,'vi'));
+}
+
+/* ---------- Vẽ bảng ---------- */
+function locLSX(){
+  const q=norm(document.getElementById('q').value), tt=document.getElementById('fTT').value;
+  const chiTre=document.getElementById('fTre').checked, anHT=document.getElementById('fAnHT').checked;
+  return M.lsx.filter(l=> (!q||l.searchText.includes(q)) && (!tt||l.Trang_Thai===tt) && (!chiTre||l.tre) && (!anHT||l.pct<1));
+}
+
+function ve(){
+  if(!M) return;
+  const ds=locLSX();
+  const allPsx=ds.flatMap(l=>l.psx);
+  const pctChung= allPsx.length? allPsx.reduce((a,p)=>a+p.pct,0)/allPsx.length : 0;
+  document.getElementById('kpis').innerHTML=[
+    ['Lệnh sản xuất', ds.length],
+    ['Phiếu sản xuất', allPsx.length],
+    ['Chi tiết', ds.reduce((a,l)=>a+l.soCT,0)],
+    ['Phiếu hoàn thành', allPsx.filter(p=>p.pct>=1).length],
+    ['Tiến độ chung', Math.round(pctChung*100)+'%'],
+    ['Lệnh trễ hạn', ds.filter(l=>l.tre).length, 'warn']
+  ].map(k=>'<div class="kpi '+(k[2]||'')+'"><div class="l">'+k[0]+'</div><div class="v">'+k[1]+'</div></div>').join('');
+
+  const tb=document.getElementById('tbLSX');
+  if(!ds.length){ tb.innerHTML='<tr><td colspan="10" class="empty">Không có lệnh sản xuất phù hợp.</td></tr>'; return; }
+  const q=norm(document.getElementById('q').value);
+  tb.innerHTML=ds.map(l=>{
+    const open=moLSX.has(l.So_LSX) || (q && !l.ownText.includes(q) && l.psx.some(p=>p.searchText.includes(q)));
+    let h='<tr class="lsx'+(open?' open':'')+'" onclick="toggleLSX(\''+esc(l.So_LSX)+'\')">'+
+      '<td><span class="caret">▶</span></td><td><b>'+esc(l.So_LSX)+'</b></td><td class="wrap">'+esc(l.Ten_LSX)+'</td>'+
+      '<td>'+esc(l.Ngay_Cap_Lenh)+'</td><td>'+esc(l.nguoi)+'</td><td>'+esc(l.Ngay_Hoan_Thanh)+'</td>'+
+      '<td>'+badge(l.Trang_Thai)+(l.tre?'<span class="badge b-late">Trễ hạn</span>':'')+'</td>'+
+      '<td>'+l.psx.length+'</td><td>'+l.soCT+'</td><td>'+bar(l.pct)+'</td></tr>';
+    if(open) h+='<tr class="sub"><td colspan="10">'+bangPhieu(l)+'</td></tr>';
+    return h;
+  }).join('');
+}
+
+function bangPhieu(l){
+  if(!l.psx.length) return '<div class="muted">Lệnh này chưa có phiếu sản xuất.</div>';
+  const q=norm(document.getElementById('q').value);
+  const ps=l.psx.filter(p=>!q||l.ownText.includes(q)||p.searchText.includes(q));
+  return '<div class="scroll"><table><thead><tr><th>Mã phiếu</th><th>Vật liệu</th><th>Người thực hiện</th><th>Ngày nhận</th>'+
+    '<th>Trạng thái</th><th>Công đoạn</th><th>Chi tiết</th><th>Tiến độ</th></tr></thead><tbody>'+
+    ps.map(p=>'<tr class="psx" onclick="moPhieu(event,\''+esc(p.Ma_PSX)+'\')">'+
+      '<td><b>'+esc(p.Ma_PSX)+'</b></td><td class="wrap">'+esc(p.Vat_Lieu)+'</td><td>'+esc(p.nguoi)+'</td>'+
+      '<td>'+esc(p.Ngay_Nhan_Phieu)+'</td><td>'+badge(p.Trang_Thai)+'</td><td>'+stepChips(p)+'</td>'+
+      '<td>'+p.lines.length+'</td><td>'+bar(p.pct)+'</td></tr>').join('')+
+    '</tbody></table></div>';
+}
+
+function stepChips(p){
+  return '<div class="steps">'+p.steps.map((s,i)=>{
+    const c= (s.tong>0&&s.xong>=s.tong)?'done':(i===p.curIdx?'cur':'');
+    return '<span class="step '+c+'" title="'+s.xong+'/'+s.tong+'">'+esc(s.ten)+'</span>';
+  }).join('')+'</div>';
+}
+
+function toggleLSX(so){ moLSX.has(so)?moLSX.delete(so):moLSX.add(so); ve(); }
+
+/* ---------- Tab sản lượng theo ngày ---------- */
+function khoangNgay(n){
+  const den=new Date(), tu=new Date(); tu.setDate(tu.getDate()-n+1);
+  const k=d=>keyNgay(d.getFullYear(),d.getMonth()+1,d.getDate());
+  document.getElementById('slTu').value= n? k(tu) : '';
+  document.getElementById('slDen').value= n? k(den) : '';
+  veSL();
+}
+function cheDoSL(b){
+  hienSL=b.dataset.v;
+  document.querySelectorAll('#slHT button').forEach(x=>x.classList.toggle('on', x===b));
+  veSL();
+}
+function locSL(){
+  const tu=document.getElementById('slTu').value, den=document.getElementById('slDen').value;
+  const cd=document.getElementById('slCD').value, lsx=document.getElementById('slLSX').value;
+  return M.sl.filter(r=> (!tu||r.ngay>=tu) && (!den||r.ngay<=den) && (!cd||r.cd===cd) && (!lsx||r.lsx===lsx));
+}
+/** Nội dung 1 ô theo chế độ hiển thị */
+function oSL(o, cls){
+  cls=cls||'';
+  if(!o || (!o.q && !o.m3)) return '<td class="z '+cls+'">–</td>';
+  const td='<td class="'+cls+'">';
+  if(hienSL==='sl') return td+fSL(o.q)+'</td>';
+  if(hienSL==='m3') return td+fM3(o.m3)+'</td>';
+  return td+fSL(o.q)+'<small>'+fM3(o.m3)+' m³</small></td>';
+}
+
+function veSL(){
+  if(!M) return;
+  const ds=locSL();
+  const cot=sapCD([...new Set(ds.map(r=>r.cd))]);
+  const bang={}, tongNgay={}, tongCD={}, tong={q:0,m3:0};
+  const cong=(o,r)=>{ o.q+=r.q; o.m3+=r.m3; };
+  ds.forEach(r=>{
+    const row=bang[r.ngay]=bang[r.ngay]||{};
+    cong(row[r.cd]=row[r.cd]||{q:0,m3:0}, r);
+    cong(tongNgay[r.ngay]=tongNgay[r.ngay]||{q:0,m3:0}, r);
+    cong(tongCD[r.cd]=tongCD[r.cd]||{q:0,m3:0}, r);
+    cong(tong, r);
+  });
+  const ngays=Object.keys(bang).sort().reverse();
+  const thieuKT=ds.filter(r=>!r.coKT).length;
+
+  document.getElementById('kpisSL').innerHTML=[
+    ['Tổng số chi tiết', fSL(tong.q)],
+    ['Tổng khối lượng', fM3(tong.m3)+' <small>m³</small>'],
+    ['Số ngày có sản lượng', ngays.length],
+    ['Trung bình / ngày', ngays.length? fM3(tong.m3/ngays.length)+' <small>m³</small>' : '–'],
+    ['Lượt ghi nhận', ds.length],
+    ['Lượt thiếu kích thước', thieuKT, thieuKT?'warn':'']
+  ].map(k=>'<div class="kpi '+(k[2]||'')+'"><div class="l">'+k[0]+'</div><div class="v">'+k[1]+'</div></div>').join('');
+
+  const el=document.getElementById('pvSL');
+  if(!ds.length){ el.innerHTML='<div class="empty">Không có sản lượng trong khoảng lọc.</div>'; return; }
+  el.innerHTML='<table class="pv"><thead><tr><th>Ngày</th>'+cot.map(c=>'<th>'+esc(c)+'</th>').join('')+'<th class="tot">Tổng ngày</th></tr></thead><tbody>'+
+    ngays.map(n=>'<tr onclick="moNgay(\''+n+'\')"><td><b>'+hienNgay(n)+'</b><span class="dow">'+thuCua(n)+'</span></td>'+
+      cot.map(c=>oSL(bang[n][c])).join('')+oSL(tongNgay[n],'tot')+'</tr>').join('')+
+    '</tbody><tfoot><tr><td>Tổng cộng</td>'+cot.map(c=>oSL(tongCD[c])).join('')+oSL(tong,'tot')+'</tr></tfoot></table>';
+}
+
+/** Ngăn chi tiết: từng lượt ghi sản lượng trong 1 ngày (theo bộ lọc đang chọn) */
+function moNgay(n){
+  const thuTu=sapCD([...new Set(M.sl.map(r=>r.cd))]);
+  const ds=locSL().filter(r=>r.ngay===n)
+    .sort((a,b)=>thuTu.indexOf(a.cd)-thuTu.indexOf(b.cd) || gioGhi(a.g.Thoi_Gian).localeCompare(gioGhi(b.g.Thoi_Gian)));
+  const theoCD={}; ds.forEach(r=>{ const o=theoCD[r.cd]=theoCD[r.cd]||{q:0,m3:0}; o.q+=r.q; o.m3+=r.m3; });
+  const q=ds.reduce((a,r)=>a+r.q,0), m3=ds.reduce((a,r)=>a+r.m3,0);
+  document.getElementById('drTitle').textContent='Sản lượng ngày '+hienNgay(n)+' ('+thuCua(n)+')';
+  document.getElementById('drSub').textContent=fSL(q)+' chi tiết · '+fM3(m3)+' m³ · '+ds.length+' lượt ghi';
+
+  let h='<div class="meta">'+sapCD(Object.keys(theoCD)).map(c=>'<div><b>'+esc(c)+'</b>'+fSL(theoCD[c].q)+' chi tiết · '+fM3(theoCD[c].m3)+' m³</div>').join('')+'</div>';
+  h+='<div class="card"><div class="scroll"><table><thead><tr><th>Giờ</th><th>Công đoạn</th><th>Lệnh SX</th><th>Mã dòng</th><th>Nhãn</th><th>Vật liệu</th>'+
+     '<th class="r">D × R × Dày (mm)</th><th class="r">Số lượng</th><th class="r">m³</th><th>Người cập nhật</th><th>Ghi chú</th></tr></thead><tbody>'+
+     ds.map(r=>'<tr><td>'+gioGhi(r.g.Thoi_Gian)+'</td><td>'+esc(r.cd)+'</td><td>'+esc(r.lsx)+'</td><td>'+esc(r.g.Ma_Dong)+'</td>'+
+       '<td class="wrap">'+esc(r.dong?r.dong.Nhan:'')+'</td><td>'+esc(r.p?r.p.Vat_Lieu:'')+'</td>'+
+       '<td class="r">'+(r.coKT? r.dai+' × '+r.rong+' × '+r.day : '<span class="badge b-late">Thiếu KT</span>')+'</td>'+
+       '<td class="r"><b>'+fSL(r.q)+'</b></td><td class="r">'+fM3(r.m3)+'</td>'+
+       '<td>'+esc(M.tenNguoi[norm(r.g.Nguoi_Cap_Nhat)]||r.g.Nguoi_Cap_Nhat)+'</td><td class="wrap">'+esc(r.g.Ghi_Chu)+'</td></tr>').join('')+
+     '</tbody></table></div></div>';
+
+  document.getElementById('drBody').innerHTML=h;
+  document.getElementById('ov').classList.add('show');
+  document.getElementById('dr').classList.add('show');
+}
+
+/* ---------- Chi tiết phiếu ---------- */
+function moPhieu(ev, ma){
+  ev.stopPropagation();
+  const p=M.psx.find(x=>x.Ma_PSX===ma); if(!p) return;
+  document.getElementById('drTitle').innerHTML='Phiếu '+esc(p.Ma_PSX)+' '+badge(p.Trang_Thai);
+  document.getElementById('drSub').textContent='Thuộc lệnh '+p.Lenh_SX;
+
+  let h='<div class="meta">'+
+    '<div><b>Vật liệu</b>'+esc(p.Vat_Lieu)+'</div><div><b>Người thực hiện</b>'+esc(p.nguoi)+'</div>'+
+    '<div><b>Ngày nhận phiếu</b>'+esc(p.Ngay_Nhan_Phieu)+'</div><div><b>Số chi tiết</b>'+p.lines.length+'</div>'+
+    '<div><b>Tiến độ</b>'+bar(p.pct)+'</div></div>'+
+    '<div><b class="muted" style="font-size:12px">QUY TRÌNH CÔNG ĐOẠN</b><div style="margin-top:6px">'+stepChips(p)+'</div></div>';
+
+  h+='<h3>Chi tiết sản phẩm và sản lượng theo công đoạn (đã làm / tổng)</h3><div class="card"><div class="scroll"><table><thead><tr>'+
+     '<th>Mã dòng</th><th>Nhãn</th><th>Dài</th><th>Rộng</th><th>SL/bộ</th><th>Tổng SL</th>'+
+     p.steps.map(s=>'<th>'+esc(s.ten)+'</th>').join('')+'</tr></thead><tbody>'+
+     (p.lines.length? p.lines.map(l=>{
+        const d=M.done[norm(l.Ma_Dong)]||{}, t=num(l.Tong_So_Luong);
+        return '<tr><td>'+esc(l.Ma_Dong)+'</td><td class="wrap">'+esc(l.Nhan)+'</td><td>'+esc(l.Dai)+'</td><td>'+esc(l.Rong)+'</td>'+
+          '<td>'+esc(l.So_Luong_1_Bo)+'</td><td><b>'+esc(l.Tong_So_Luong)+'</b></td>'+
+          p.steps.map(s=>{ const x=d[s.ten]||0; const c=x>=t&&t>0?'cell-ok':(x>0?'cell-part':'cell-zero');
+            return '<td class="'+c+'">'+x+' / '+t+'</td>'; }).join('')+'</tr>';
+      }).join('') : '<tr><td colspan="'+(6+p.steps.length)+'" class="empty">Phiếu chưa có chi tiết.</td></tr>')+
+     '</tbody></table></div></div>';
+
+  const logs=p.lines.flatMap(l=>M.logTheoDong[norm(l.Ma_Dong)]||[]);
+  h+='<h3>Lịch sử ghi sản lượng ('+logs.length+')</h3>';
+  h+= logs.length? '<div class="card"><div class="scroll"><table><thead><tr><th>Thời gian</th><th>Mã dòng</th><th>Công đoạn</th><th>Số lượng</th><th>Người cập nhật</th><th>Ghi chú</th></tr></thead><tbody>'+
+      logs.slice().reverse().map(g=>'<tr><td>'+esc(g.Thoi_Gian)+'</td><td>'+esc(g.Ma_Dong)+'</td><td>'+esc(g.Cong_Doan)+'</td><td><b>'+esc(g.So_Luong)+'</b></td>'+
+        '<td>'+esc(M.tenNguoi[norm(g.Nguoi_Cap_Nhat)]||g.Nguoi_Cap_Nhat)+'</td><td class="wrap">'+esc(g.Ghi_Chu)+'</td></tr>').join('')+
+      '</tbody></table></div></div>' : '<div class="muted">Chưa có ghi nhận sản lượng nào cho phiếu này.</div>';
+
+  document.getElementById('drBody').innerHTML=h;
+  document.getElementById('ov').classList.add('show');
+  document.getElementById('dr').classList.add('show');
+}
+function dongPhieu(){ document.getElementById('ov').classList.remove('show'); document.getElementById('dr').classList.remove('show'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') dongPhieu(); });
+
+taiDuLieu();
+</script>
+</body>
+</html>
