@@ -85,8 +85,12 @@
   table.pv td small{display:block;color:var(--muted);font-size:11.5px}
   table.pv td.z{color:#c3cad3}
   table.pv td.tot,table.pv th.tot{border-left:2px solid var(--line);font-weight:600}
-  table.pv tbody tr{cursor:pointer}
-  table.pv tbody tr:hover td{outline:1px solid #d9c4ad;outline-offset:-1px}
+  table.pv tbody td{cursor:pointer}
+  table.pv tbody td:hover{outline:2px solid #d9c4ad;outline-offset:-2px}
+  table.pv td.hi{background:rgba(31,157,85,.13)}
+  table.pv td.lo{background:rgba(212,138,0,.15)}
+  table.pv tfoot tr.avg td{background:#fafbfc;color:var(--muted);font-weight:500;border-top:1px solid var(--line)}
+  .lg{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin:0 3px 0 8px}
   table.pv tfoot td{background:var(--brand-soft);font-weight:600;border-top:2px solid #d9c4ad}
   table.pv tfoot td:first-child{background:var(--brand-soft)}
   .dow{color:var(--muted);font-size:12px;margin-left:4px}
@@ -161,7 +165,9 @@
     </section>
 
     <section class="card"><div class="scroll" id="pvSL"></div></section>
-    <p class="note">Số chi tiết = tổng <b>So_Luong</b> ghi nhận trong ngày. m³ = Dài × Rộng × Dày (mm) × số lượng ÷ 10⁹, độ dày lấy từ vật liệu của phiếu (vd. “MLM 6626 <b>12mm</b>”). Bấm vào một ngày để xem từng lượt ghi.</p>
+    <p class="note">Số chi tiết = tổng <b>So_Luong</b> ghi nhận trong ngày. m³ = Dài × Rộng × Dày (mm) × số lượng ÷ 10⁹, độ dày lấy từ vật liệu của phiếu (vd. “MLM 6626 <b>12mm</b>”). Cắt ván 2, 3… được gộp vào <b>Cắt ván</b>; Dán biên 2, 3… gộp vào <b>Dán biên</b>.<br>
+      Màu so với trung bình/ngày của từng công đoạn trong khoảng đang xem:<span class="lg" style="background:rgba(31,157,85,.25)"></span>≥ trung bình<span class="lg" style="background:rgba(212,138,0,.28)"></span>dưới trung bình.
+      Bấm vào một ô để xem các lượt ghi của ngày và công đoạn đó (bấm cột Ngày hoặc Tổng ngày để xem cả ngày).</p>
   </div>
 </main>
 
@@ -255,6 +261,12 @@ function ngayGhi(s){
   const d=new Date(s); return isNaN(d)?null:keyNgay(d.getFullYear(),d.getMonth()+1,d.getDate());
 }
 function gioGhi(s){ const m=String(s||'').match(/(\d{1,2}):(\d{2})/); return m?pad(m[1])+':'+m[2]:''; }
+/** Gộp các công đoạn đánh số (Cắt ván 2, Cắt ván 3, Dán biên 2…) về công đoạn gốc */
+function gomCD(t){
+  t=String(t||'').normalize('NFC');
+  const m=t.match(/^(CẮT VÁN|DÁN BIÊN)\s*[-_]?\s*\d+$/);
+  return m?m[1]:t;
+}
 /** Độ dày (mm) lấy từ tên vật liệu, vd. "MLM 6626 12mm" → 12 */
 function doDay(vl){ const m=String(vl||'').match(/(\d+(?:[.,]\d+)?)\s*mm\b/i); return m?num(m[1]):0; }
 function badge(tt){
@@ -317,12 +329,13 @@ function tinhToan(){
   // Từng lượt ghi sản lượng kèm ngày, công đoạn, số chi tiết và m³
   const dongTheoMa={}; D.ct.forEach(c=>{ dongTheoMa[norm(c.Ma_Dong)]=c; });
   const psxTheoMa={}; psx.forEach(p=>{ psxTheoMa[norm(p.Ma_PSX)]=p; });
-  const thuTuCD={}; D.cd.forEach((c,i)=>{ thuTuCD[norm(c.Ten_Cong_Doan)]=i; });
+  const thuTuCD={}; D.cd.forEach((c,i)=>{ const k=gomCD(norm(c.Ten_Cong_Doan)); if(!(k in thuTuCD)) thuTuCD[k]=i; });
   const sl=D.gsl.map(g=>{
     const dong=dongTheoMa[norm(g.Ma_Dong)]||null, p=dong?psxTheoMa[norm(dong.Ma_PSX)]:null;
     const q=num(g.So_Luong), dai=dong?num(dong.Dai):0, rong=dong?num(dong.Rong):0, day=p?doDay(p.Vat_Lieu):0;
     const coKT=dai>0&&rong>0&&day>0;
-    return {g, ngay:ngayGhi(g.Thoi_Gian), cd:tenCD(g.Cong_Doan), q, m3: coKT? dai*rong*day*q/1e9 : 0, coKT,
+    const cdGoc=tenCD(g.Cong_Doan);
+    return {g, ngay:ngayGhi(g.Thoi_Gian), cd:gomCD(cdGoc), cdGoc, q, m3: coKT? dai*rong*day*q/1e9 : 0, coKT,
       dong, p, lsx: p?p.Lenh_SX:'', dai, rong, day};
   }).filter(r=>r.ngay && r.cd);
 
@@ -425,14 +438,20 @@ function locSL(){
   return M.sl.filter(r=> (!tu||r.ngay>=tu) && (!den||r.ngay<=den) && (!cd||r.cd===cd) && (!lsx||r.lsx===lsx));
 }
 /** Nội dung 1 ô theo chế độ hiển thị */
-function oSL(o, cls){
-  cls=cls||'';
-  if(!o || (!o.q && !o.m3)) return '<td class="z '+cls+'">–</td>';
-  const td='<td class="'+cls+'">';
+function oSL(o, cls, tb, attr){
+  cls=cls||''; attr=attr||'';
+  if(!o || (!o.q && !o.m3)) return '<td class="z '+cls+'"'+attr+'>–</td>';
+  if(tb && tb.n){   // tô màu so với trung bình/ngày
+    const avg=giaTri(tb)/tb.n;
+    if(avg>0) cls+= giaTri(o)>=avg?' hi':' lo';
+  }
+  const td='<td class="'+cls+'"'+attr+'>';
   if(hienSL==='sl') return td+fSL(o.q)+'</td>';
   if(hienSL==='m3') return td+fM3(o.m3)+'</td>';
   return td+fSL(o.q)+'<small>'+fM3(o.m3)+' m³</small></td>';
 }
+
+const giaTri = o => hienSL==='m3'? o.m3 : o.q;   // giá trị dùng để so sánh với trung bình
 
 function veSL(){
   if(!M) return;
@@ -461,26 +480,33 @@ function veSL(){
 
   const el=document.getElementById('pvSL');
   if(!ds.length){ el.innerHTML='<div class="empty">Không có sản lượng trong khoảng lọc.</div>'; return; }
+  // Trung bình mỗi công đoạn = tổng công đoạn ÷ số ngày đang hiển thị
+  const nN=ngays.length, tbCD={}; cot.forEach(c=>{ tbCD[c]={...tongCD[c], n:nN}; });
+  const tbTong={...tong, n:nN}, chia=o=>({q:o.q/nN, m3:o.m3/nN});
+  const at=(n,c)=>' data-n="'+n+'"'+(c?' data-cd="'+esc(c)+'"':'')+' onclick="moO(this)"';
   el.innerHTML='<table class="pv"><thead><tr><th>Ngày</th>'+cot.map(c=>'<th>'+esc(c)+'</th>').join('')+'<th class="tot">Tổng ngày</th></tr></thead><tbody>'+
-    ngays.map(n=>'<tr onclick="moNgay(\''+n+'\')"><td><b>'+hienNgay(n)+'</b><span class="dow">'+thuCua(n)+'</span></td>'+
-      cot.map(c=>oSL(bang[n][c])).join('')+oSL(tongNgay[n],'tot')+'</tr>').join('')+
-    '</tbody><tfoot><tr><td>Tổng cộng</td>'+cot.map(c=>oSL(tongCD[c])).join('')+oSL(tong,'tot')+'</tr></tfoot></table>';
+    ngays.map(n=>'<tr><td'+at(n)+'><b>'+hienNgay(n)+'</b><span class="dow">'+thuCua(n)+'</span></td>'+
+      cot.map(c=>oSL(bang[n][c],'',tbCD[c],at(n,c))).join('')+oSL(tongNgay[n],'tot',tbTong,at(n))+'</tr>').join('')+
+    '</tbody><tfoot><tr class="avg"><td>Trung bình / ngày</td>'+cot.map(c=>oSL(chia(tongCD[c]))).join('')+oSL(chia(tong),'tot')+'</tr>'+
+    '<tr><td>Tổng cộng</td>'+cot.map(c=>oSL(tongCD[c])).join('')+oSL(tong,'tot')+'</tr></tfoot></table>';
 }
+function moO(td){ moNgay(td.dataset.n, td.dataset.cd||''); }
 
-/** Ngăn chi tiết: từng lượt ghi sản lượng trong 1 ngày (theo bộ lọc đang chọn) */
-function moNgay(n){
+/** Ngăn chi tiết: từng lượt ghi sản lượng trong 1 ngày, có thể chỉ 1 công đoạn (theo bộ lọc đang chọn) */
+function moNgay(n, cd){
   const thuTu=sapCD([...new Set(M.sl.map(r=>r.cd))]);
-  const ds=locSL().filter(r=>r.ngay===n)
+  const ds=locSL().filter(r=>r.ngay===n && (!cd||r.cd===cd))
     .sort((a,b)=>thuTu.indexOf(a.cd)-thuTu.indexOf(b.cd) || gioGhi(a.g.Thoi_Gian).localeCompare(gioGhi(b.g.Thoi_Gian)));
-  const theoCD={}; ds.forEach(r=>{ const o=theoCD[r.cd]=theoCD[r.cd]||{q:0,m3:0}; o.q+=r.q; o.m3+=r.m3; });
+  // Xem cả ngày: tóm tắt theo công đoạn đã gộp; xem 1 công đoạn: tách theo công đoạn gốc (Cắt ván 2, 3…)
+  const theoCD={}; ds.forEach(r=>{ const k=cd?r.cdGoc:r.cd, o=theoCD[k]=theoCD[k]||{q:0,m3:0}; o.q+=r.q; o.m3+=r.m3; });
   const q=ds.reduce((a,r)=>a+r.q,0), m3=ds.reduce((a,r)=>a+r.m3,0);
-  document.getElementById('drTitle').textContent='Sản lượng ngày '+hienNgay(n)+' ('+thuCua(n)+')';
+  document.getElementById('drTitle').textContent=(cd?cd+' – ':'')+'Sản lượng ngày '+hienNgay(n)+' ('+thuCua(n)+')';
   document.getElementById('drSub').textContent=fSL(q)+' chi tiết · '+fM3(m3)+' m³ · '+ds.length+' lượt ghi';
 
   let h='<div class="meta">'+sapCD(Object.keys(theoCD)).map(c=>'<div><b>'+esc(c)+'</b>'+fSL(theoCD[c].q)+' chi tiết · '+fM3(theoCD[c].m3)+' m³</div>').join('')+'</div>';
   h+='<div class="card"><div class="scroll"><table><thead><tr><th>Giờ</th><th>Công đoạn</th><th>Lệnh SX</th><th>Mã dòng</th><th>Nhãn</th><th>Vật liệu</th>'+
      '<th class="r">D × R × Dày (mm)</th><th class="r">Số lượng</th><th class="r">m³</th><th>Người cập nhật</th><th>Ghi chú</th></tr></thead><tbody>'+
-     ds.map(r=>'<tr><td>'+gioGhi(r.g.Thoi_Gian)+'</td><td>'+esc(r.cd)+'</td><td>'+esc(r.lsx)+'</td><td>'+esc(r.g.Ma_Dong)+'</td>'+
+     ds.map(r=>'<tr><td>'+gioGhi(r.g.Thoi_Gian)+'</td><td>'+esc(r.cdGoc)+'</td><td>'+esc(r.lsx)+'</td><td>'+esc(r.g.Ma_Dong)+'</td>'+
        '<td class="wrap">'+esc(r.dong?r.dong.Nhan:'')+'</td><td>'+esc(r.p?r.p.Vat_Lieu:'')+'</td>'+
        '<td class="r">'+(r.coKT? r.dai+' × '+r.rong+' × '+r.day : '<span class="badge b-late">Thiếu KT</span>')+'</td>'+
        '<td class="r"><b>'+fSL(r.q)+'</b></td><td class="r">'+fM3(r.m3)+'</td>'+
